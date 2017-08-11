@@ -22,7 +22,7 @@ public class ClientesController extends Cliente {
     ResultSet resultSet = null;
     Statement statement = null;
 
-    public boolean agregarCliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, int telefono) throws SQLException {
+    public boolean agregarCliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, String telefono) throws SQLException {
 
         //search for product
         int encontrado = buscarCliente(nombre);
@@ -46,7 +46,7 @@ public class ClientesController extends Cliente {
 
         //delete if found
         if (encontrado > 0) {
-            String insertSQL = "DELETE FROM clientes WHERE pk_productoid = " + encontrado;
+            String insertSQL = "DELETE FROM clientes WHERE pk_clienteid = " + encontrado;
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             preparedStatement.executeUpdate();
         }
@@ -60,23 +60,23 @@ public class ClientesController extends Cliente {
         while (resultSet.next()) {
             if (resultSet.getString("nombre").equals(nombreCliente)) {
                 this.nombre = resultSet.getString("nombre");
-                this.apellidoPaterno = resultSet.getString("Apellido Paterno");
-                this.apellidoMaterno = resultSet.getString("Apellido Materno");
-                this.rfc = resultSet.getString("RFC");
-                this.telefono = resultSet.getInt("telefono");
+                this.apellidoPaterno = resultSet.getString("apellidopaterno");
+                this.apellidoMaterno = resultSet.getString("apellidomaterno");
+                this.rfc = resultSet.getString("rfc");
+                this.telefono = resultSet.getString("telefono");
                 return resultSet.getInt("pk_clienteid");
             }
         }
         return -1;
     }
 
-    public void modificarCliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, int telefono) throws SQLException {
+    public void modificarCliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, String telefono) throws SQLException {
         int encontrado = buscarCliente(nombre);
 
         //delete if found
         if (encontrado > 0) {
             System.out.print(encontrado);
-            String insertSQL = "UPDATE clientes SET nombre = '" + nombre + "', apellidoPaterno = '" + apellidoPaterno + "', apellidoMaterno = '" + apellidoMaterno + "', rfc = '" + rfc + "', telefono = '" + telefono + "' WHERE pk_productoid = " + encontrado;
+            String insertSQL = "UPDATE clientes SET nombre = '" + nombre + "', apellidopaterno = '" + apellidoPaterno + "', apellidomaterno = '" + apellidoMaterno + "', rfc = '" + rfc + "', telefono = '" + telefono + "' WHERE pk_clienteid = " + encontrado;
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             preparedStatement.executeUpdate();
         }
@@ -86,7 +86,7 @@ public class ClientesController extends Cliente {
         Postgres postgres = new Postgres();
         Connection connection = postgres.connect();
 
-        DefaultTableModel model = new DefaultTableModel(new String[]{"Nombre", "Apellido Paterno", "Apellido Materno", "RFC", "telefono"}, 0);
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Nombre", "Apellido Paterno", "Apellido Materno", "RFC", "Telefono"}, 0);
         String sql = "SELECT * FROM clientes";
 
         statement = connection.createStatement();
@@ -97,14 +97,10 @@ public class ClientesController extends Cliente {
             String apellidoPaterno = resultSet.getString("apellidopaterno");
             String apellidoMaterno = resultSet.getString("apellidomaterno");
             String rfc = resultSet.getString("rfc");
-            String telefono = String.valueOf(resultSet.getInt("telefono"));
+            String telefono = resultSet.getString("telefono");
             model.addRow(new Object[]{nombre, apellidoPaterno, apellidoMaterno, rfc, telefono});
         }
         return model;
-    }
-
-    public boolean agregarCliente(String text, String text0) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

@@ -9,25 +9,26 @@ package Models;
  *
  * @author juanba
  */
-public class Proveedor {
-    
+public abstract class Proveedor {
+
     //Instance Variables
     public String nombre;
+    public String apellidoPaterno;
+    public String apellidoMaterno;
     public String rfc;
-    public int telefono;
-    public String ciudad;
-    public String estado;
-    
+    public String telefono;
+
     //Constructors
     public Proveedor() {
+
     }
 
-    public Proveedor(String nombre, String rfc, int telefono, String ciudad, String estado) {
+    public Proveedor(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, String telefono) {
         this.nombre = nombre;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
         this.rfc = rfc;
         this.telefono = telefono;
-        this.ciudad = ciudad;
-        this.estado = estado;
     }
     
     //Getters and Setters
@@ -39,6 +40,22 @@ public class Proveedor {
         this.nombre = nombre;
     }
 
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
     public String getRfc() {
         return rfc;
     }
@@ -47,29 +64,13 @@ public class Proveedor {
         this.rfc = rfc;
     }
 
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-
-    public String getCiudad() {
-        return ciudad;
-    }
-
-    public void setCiudad(String ciudad) {
-        this.ciudad = ciudad;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
     
-    
+
 }

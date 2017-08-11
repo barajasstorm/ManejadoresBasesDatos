@@ -32,16 +32,24 @@ CREATE TABLE clientes (
 	apellidopaterno varchar (30) NOT NULL,
 	apellidomaterno varchar (30) NOT NULL,
 	rfc varchar (30) NOT NULL,
-	telefono INT NOT NULL	
+	telefono varchar (10) NOT NULL	
 );
 
 CREATE TABLE proveedores (
 	pk_proveedorid SERIAL NOT NULL PRIMARY KEY,
 	nombre varchar (30) NOT NULL,
+	apellidopaterno varchar (30) NOT NULL,
+	apellidomaterno varchar (30) NOT NULL,
 	rfc varchar (30) NOT NULL,
-	telefono INT NOT NULL,
-	ciudad varchar (30) NOT NULL,
-	estado varchar (30) NOT NULL	
+	telefono varchar (10) NOT NULL	
+);
+
+CREATE TABLE cortes (
+	pk_corteid SERIAL NOT NULL PRIMARY KEY,
+	ventastotales REAL NOT NULL,
+	saldoalcorte REAL NOT NULL,
+	cantidadtickets INT NOT NULL,
+	productosvendidos INT NOT NULL
 );
 
 CREATE TABLE ventas (
@@ -92,6 +100,7 @@ CREATE TABLE ticketformato (
 );
 
 
+
 insert into usuarios (username,password,nombre,apellidopaterno, apellidomaterno) 
 	values ('jbarajas','12345','Juan','Barajas','Martinez');
 
@@ -122,7 +131,12 @@ insert into clientes (nombre,apellidopaterno,apellidomaterno,rfc,telefono)
 	values ('Steve','Jobs','Jobs','XXXX0000X0X0X0X',3333000000);
 
 
+insert into proveedores (nombre,apellidopaterno,apellidomaterno,rfc,telefono) 
+	values ('Joaquin','Guzman','Loera','XXXX0000X0X0X0X',3333000000);
+
+insert into proveedores (nombre,apellidopaterno,apellidomaterno,rfc,telefono) 
+	values ('Pablo','Excobar','Gaviria','XXXX0000X0X0X0X',3333000000);
+
+
 insert into ticketformato (linea1,linea2,linea3,linea4,linea5,linea6,linea7) 
 	values ('Mi Tiendita','Direccion 123 Col. Colonia','(123) 000 0000','RFC01234567','', 'Gracias por su compra', 'www.juanbarajas.com');
-
-

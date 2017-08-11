@@ -9,20 +9,20 @@ package Models;
  *
  * @author juanba
  */
-public class Cliente {
+public abstract class Cliente {
     
     //Instance Variables
     public String nombre;
     public String apellidoPaterno;
     public String apellidoMaterno;
     public String rfc;
-    public int telefono;
+    public String telefono;
 
     //Constructors
     public Cliente() {
     }
 
-    public Cliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, int telefono) {
+    public Cliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, String telefono) {
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;
@@ -64,11 +64,11 @@ public class Cliente {
         this.rfc = rfc;
     }
 
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
     

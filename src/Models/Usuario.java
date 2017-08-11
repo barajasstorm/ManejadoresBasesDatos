@@ -20,34 +20,25 @@ import java.sql.*;
  */
 public class Usuario extends Postgres {
     //Instance Variables
-    private int pk_UsuarioID;
-    private String nombre;
-    private String apellidoPaterno;
-    private String apellidoMaterno;
-    private String userName;
-    private String password;
-    
-    
-    //Constructors
+    public String nombre;
+    public String apellidoPaterno;
+    public String apellidoMaterno;
+    public String username;
+    public String password;
+    public int pk_usuarioID;
+
     public Usuario() {
     }
 
-    public Usuario(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
-    }
-    
-    public Usuario(String nombre, String apellidoPaterno, String apellidoMaterno, String userName, String password, int pk_usuarioid) {
+    public Usuario(String nombre, String apellidoPaterno, String apellidoMaterno, String username, String password, int pk_usuarioID) {
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
-        this.pk_UsuarioID = pk_usuarioid;
+        this.pk_usuarioID = pk_usuarioID;
     }
 
-    
-    //Getters and Setters
     public String getNombre() {
         return nombre;
     }
@@ -72,12 +63,12 @@ public class Usuario extends Postgres {
         this.apellidoMaterno = apellidoMaterno;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -88,71 +79,12 @@ public class Usuario extends Postgres {
         this.password = password;
     }
 
-    public int getPk_usuarioid() {
-        return pk_UsuarioID;
+    public int getPk_usuarioID() {
+        return pk_usuarioID;
     }
 
-    public void setPk_usuarioid(int pk_usuarioid) {
-        this.pk_UsuarioID = pk_UsuarioID;
+    public void setPk_usuarioID(int pk_usuarioID) {
+        this.pk_usuarioID = pk_usuarioID;
     }
-    
-    public void login() throws ClassNotFoundException {
-        
-        Statement statement = null; // query statement
-        Connection connection = null; // manages connection
-
-        try {
-            Class.forName(JDBC_DRIVER); // load database driver class
-
-            // establish connection to database
-            connection
-                    = DriverManager.getConnection(DATABASE_URL, "postgres", "password");
-
-            // create Statement for querying database
-            statement = connection.createStatement();
-
-            // query database
-            ResultSet resultSet = statement.executeQuery(
-                    "SELECT pk_usuarioid, nombre FROM usuarios");
-
-            // process query results
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int numberOfColumns = metaData.getColumnCount();
-            System.out.println("Users of Database:");
-
-            for (int i = 1; i <= numberOfColumns; i++) {
-                System.out.printf("%-8s\t", metaData.getColumnName(i));
-            }
-            System.out.println();
-
-            while (resultSet.next()) {
-                for (int i = 1; i <= numberOfColumns; i++) {
-                    System.out.printf("%-8s\t", resultSet.getObject(i));
-                }
-                System.out.println();
-            } // end while
-        } // end try
-        catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            System.exit(1);
-        } // end catch
-        catch (ClassNotFoundException classNotFound) {
-            classNotFound.printStackTrace();
-            System.exit(1);
-        } // end catch
-        finally // ensure statement and connection are closed properly
-        {
-            try {
-                statement.close();
-                connection.close();
-            } // end try                                               
-            catch (Exception exception) {
-                exception.printStackTrace();
-                System.exit(1);
-            } // end catch                                             
-        } // end finally
-        
-    }
-
     
 }
