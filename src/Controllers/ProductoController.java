@@ -84,6 +84,18 @@ public class ProductoController extends Producto {
             preparedStatement.executeUpdate();
         }
     }
+    
+    public void modificarVentaProducto(String nombre, int existencias) throws SQLException {
+        int encontrado = buscarProducto(nombre);
+
+        //delete if found
+        if (encontrado > 0) {
+            System.out.print(encontrado);
+            String insertSQL = "UPDATE productos SET existencias = '" + existencias + "' WHERE pk_productoid = " + encontrado;
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.executeUpdate();
+        }
+    }
 
     public DefaultTableModel todosProductosDisplay() throws SQLException {
         Postgres postgres = new Postgres();

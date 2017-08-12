@@ -5,11 +5,25 @@
  */
 package Models;
 
+import Controllers.Postgres;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author juanba
  */
 public class Corte {
+    
+    Postgres postgres = new Postgres();
+    Connection connection = postgres.connect();
+    ResultSet resultSet = null;
+    Statement statement = null;
     
     //Instances variables
     private int pk_corteID;
@@ -19,6 +33,12 @@ public class Corte {
     private int productosVendidos;
 
     public Corte() {
+    }
+    
+    public Corte(double ventasTotales, int cantidadTickets, int productosVendidos) {
+        this.ventasTotales = ventasTotales;
+        this.cantidadTickets = cantidadTickets;
+        this.productosVendidos = productosVendidos;
     }
 
     public Corte(int pk_corteID, double ventasTotales, double saldoAlCorte, int cantidadTickets, int productosVendidos) {
@@ -70,6 +90,22 @@ public class Corte {
     }
     
     
+    public void saveToDatabase(int corteID) {
+        try {
+            //update current corte and close
+            String insertSQL = "UPDATE cortes SET ventastotales = '" + this.ventasTotales + "', cantidadtickets = '" + this.cantidadTickets + "', productosvendidos = '" + this.productosVendidos + "' WHERE pk_corteid = " + corteID;         
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.executeUpdate();
+            
+            //insert new corte for future
+            insertSQL = "insert into cortes (ventastotales,cantidadtickets,productosvendidos) values (NULL, NULL, NULL);";         
+            preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     
 }

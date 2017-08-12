@@ -22,6 +22,7 @@ public class VentaController {
     Statement statement = null;
     
     private int ticketNumero;
+    private int actualID;
     
     
     public void siguienteTicket() throws SQLException {
@@ -32,6 +33,15 @@ public class VentaController {
             setTicketNumero((resultSet.getInt("numeroticket")) + 1);
         }
     }
+    
+    public void calculateActualIDFromDatabase() throws SQLException {
+        String selectSQL = "SELECT * FROM ventas ORDER BY pk_ventaid DESC LIMIT 1";
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(selectSQL);
+        while (resultSet.next()) {
+            setActualID((resultSet.getInt("pk_ventaid")));
+        }
+    }
 
     public int getTicketNumero() {
         return ticketNumero;
@@ -39,6 +49,14 @@ public class VentaController {
 
     public void setTicketNumero(int ticketNumero) {
         this.ticketNumero = ticketNumero;
+    }
+
+    public int getActualID() {
+        return actualID;
+    }
+
+    public void setActualID(int actualID) {
+        this.actualID = actualID;
     }
     
     
