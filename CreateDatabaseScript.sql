@@ -46,10 +46,9 @@ CREATE TABLE proveedores (
 
 CREATE TABLE cortes (
 	pk_corteid SERIAL NOT NULL PRIMARY KEY,
-	ventastotales REAL NOT NULL,
-	saldoalcorte REAL NOT NULL,
-	cantidadtickets INT NOT NULL,
-	productosvendidos INT NOT NULL
+	ventastotales REAL,
+	cantidadtickets INT,
+	productosvendidos INT
 );
 
 CREATE TABLE ventas (
@@ -118,25 +117,40 @@ insert into productos (nombre,preciocompra,precioventa,existencias,stockminimo,a
 	values ('Arroz',2.00,5.00,100,5,1);
 
 insert into productos (nombre,preciocompra,precioventa,existencias,stockminimo,activo) 
-	values ('iPhone',10000.00,15000.00,20,5,1);
+	values ('Leche',10,15.00,20,5,1);
 
 insert into productos (nombre,preciocompra,precioventa,existencias,stockminimo,activo) 
-	values ('Mac Book Pro',20000.00,25000.00,20,5,1);
+	values ('Jugo',10,15.00,20,5,1);
 
 
 insert into clientes (nombre,apellidopaterno,apellidomaterno,rfc,telefono) 
-	values ('Angelina','Jolie','Jolie','XXXX0000X0X0X0X',3333000000);
+	values ('Angelina','Jolie','Jolie','AJJ1111111111',3333000000);
 
 insert into clientes (nombre,apellidopaterno,apellidomaterno,rfc,telefono) 
-	values ('Steve','Jobs','Jobs','XXXX0000X0X0X0X',3333000000);
+	values ('Steve','Jobs','Jobs','SJJ2222222222',3333000000);
 
 
 insert into proveedores (nombre,apellidopaterno,apellidomaterno,rfc,telefono) 
-	values ('Joaquin','Guzman','Loera','XXXX0000X0X0X0X',3333000000);
+	values ('Joaquin','Guzman','Loera','JGL11111111111',3333000000);
 
 insert into proveedores (nombre,apellidopaterno,apellidomaterno,rfc,telefono) 
-	values ('Pablo','Excobar','Gaviria','XXXX0000X0X0X0X',3333000000);
+	values ('Pablo','Excobar','Gaviria','PEG2222222222',3333000000);
 
 
 insert into ticketformato (linea1,linea2,linea3,linea4,linea5,linea6,linea7) 
 	values ('Mi Tiendita','Direccion 123 Col. Colonia','(123) 000 0000','RFC01234567','', 'Gracias por su compra', 'www.juanbarajas.com');
+
+insert into cortes (ventastotales,cantidadtickets,productosvendidos) 
+	values (NULL, NULL, NULL);
+
+insert into ventas (fk_usuarioid, fk_corteid, fk_clienteid, numeroticket, dia, mes, ano, hora, cantarticulos, total) 
+	values (1, 1, 1, 1000, 11, 08, 2017, '8:52 PM', 2, 100.00);
+
+insert into ventas (fk_usuarioid, fk_corteid, fk_clienteid, numeroticket, dia, mes, ano, hora, cantarticulos, total) 
+	values (1, 1, 1, 1001, 11, 08, 2017, '9:00 PM', 2, 100.00);
+
+insert into ventasproductos (fk_ventaid, fk_productoid, cantidad, importeproducto) 
+	values (1, 1, 2, 100.00);
+
+insert into ventasproductos (fk_ventaid, fk_productoid, cantidad, importeproducto) 
+	values (2, 1, 2, 100.00);
