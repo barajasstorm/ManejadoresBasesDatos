@@ -13,6 +13,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,6 +28,11 @@ public class Usuario extends Postgres {
     public String username;
     public String password;
     public int pk_usuarioID;
+    
+    Postgres postgres = new Postgres();
+    Connection connection = postgres.connect();
+    ResultSet resultSet = null;
+    Statement statement = null;
 
     public Usuario() {
     }
@@ -85,6 +92,25 @@ public class Usuario extends Postgres {
 
     public void setPk_usuarioID(int pk_usuarioID) {
         this.pk_usuarioID = pk_usuarioID;
+    }
+    
+    public void loadUserDetails(int pk_usuarioID) {
+        try {
+            String selectSQL = "SELECT * FROM usuarios WHERE pk_usuarioid = " + pk_usuarioID;
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(selectSQL);
+            
+            while (resultSet.next()) {
+                this.pk_usuarioID = resultSet.getInt("pk_usuarioid");
+                this.username = resultSet.getString("username");
+                this.password = resultSet.getString("password");
+                this.nombre = resultSet.getString("nombre");
+                this.apellidoPaterno = resultSet.getString("apellidopaterno");
+                this.apellidoMaterno = resultSet.getString("apellidomaterno");  
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
