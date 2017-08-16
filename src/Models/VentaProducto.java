@@ -92,7 +92,7 @@ public class VentaProducto {
     public void saveToDatabase() {
         try {
             String insertSQL = "insert into ventasproductos (fk_ventaid,fk_productoid,cantidad,importeproducto) values ('" + this.fk_ventaid + "','" + this.fk_productoid + "','" + this.cantidad + "','" + this.importeProducto  + "');";
-
+            System.out.print("Cantidad save to db: " + this.cantidad + " .");
             //Insert product into database after validation           
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             preparedStatement.executeUpdate();

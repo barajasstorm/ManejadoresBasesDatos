@@ -2954,12 +2954,13 @@ public class home extends javax.swing.JFrame {
                         .addGap(32, 32, 32)
                         .addComponent(errorCompras)))
                 .addGap(24, 24, 24)
-                .addGroup(comprasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel98)
-                    .addComponent(proveedorBuscarField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(comprasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel138, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel138, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(comprasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel98)
+                        .addComponent(proveedorBuscarField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(comprasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel99)
@@ -5233,6 +5234,7 @@ public class home extends javax.swing.JFrame {
                         double precioVenta = (double) todosProductosVentasTable.getModel().getValueAt(i, 1);
                         int existencias = Integer.parseInt((String) todosProductosVentasTable.getModel().getValueAt(i, 2));
                         int cantidad = (int) todosProductosVentasTable.getModel().getValueAt(i, 3);
+                        System.out.print("Cantidad: " + cantidad + " .");
                         double importe = (double) todosProductosVentasTable.getModel().getValueAt(i, 4);
 
                         VentaProducto ventaProd = new VentaProducto(
@@ -5259,6 +5261,7 @@ public class home extends javax.swing.JFrame {
                     ventaControl.siguienteTicket();
                     jLabel18.setText(String.valueOf(ventaControl.getTicketNumero()));
                     jLabel16.setText("0.00");
+                    total = 0;
 
                 } catch (SQLException ex) {
                     Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
