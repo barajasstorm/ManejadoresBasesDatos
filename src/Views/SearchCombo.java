@@ -111,9 +111,7 @@ public class SearchCombo extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
-    /**
-     * @param args the command line arguments
-     */
+    
 // Variables declaration - do not modify
     private javax.swing.JComboBox jComboBox1;
 // End of variables declaration
