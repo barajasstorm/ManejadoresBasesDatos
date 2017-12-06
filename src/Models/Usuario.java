@@ -5,7 +5,7 @@
  */
 package Models;
 
-import Controllers.Postgres;
+import Controllers.Connector;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author juanba
  */
-public class Usuario extends Postgres {
+public class Usuario extends Connector {
     //Instance Variables
     public String nombre;
     public String apellidoPaterno;
@@ -29,8 +29,8 @@ public class Usuario extends Postgres {
     public String password;
     public int pk_usuarioID;
     
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection connection = connector.getPostgresConnection();
     ResultSet resultSet = null;
     Statement statement = null;
 

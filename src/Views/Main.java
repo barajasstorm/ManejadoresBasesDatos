@@ -24,9 +24,6 @@ import java.util.logging.Logger;
  */
 public class Main {
 
-    static final String JDBC_DRIVER = "org.postgresql.Driver";
-    static final String DATABASE_URL = "jdbc:postgresql://localhost/final";
-
     public static void main(String args[]) {
 
         /* Set the Nimbus look and feel */
@@ -47,7 +44,11 @@ public class Main {
         //</editor-fold>
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new home().setVisible(true);
+            try {
+                new home().setVisible(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
         

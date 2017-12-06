@@ -5,7 +5,7 @@
  */
 package Models;
 
-import Controllers.Postgres;
+import Controllers.Connector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,10 +20,22 @@ import java.util.logging.Logger;
  */
 public class VentaProducto {
     
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection postgresConnection = connector.getPostgresConnection();
+    Connection mysqlConnection = connector.getMysqlConnection();
+    PreparedStatement postgresBegin;
+    PreparedStatement postgresCommit;
+    PreparedStatement postgresRollback;
+    PreparedStatement mysqlBegin;
+    PreparedStatement mysqlCommit;
+    PreparedStatement mysqlRollback;
+    PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Statement statement = null;
+    boolean mysql = false;
+    boolean postgres = false;
+    int mysqlCount = 0;
+    int postgresCount = 0;
     
     private int pk_ventaproductoid;
     private int fk_ventaid;
@@ -31,22 +43,48 @@ public class VentaProducto {
     private int cantidad;
     private double importeProducto;
 
-    public VentaProducto() {
+    public VentaProducto() throws SQLException {
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
     }
 
-    public VentaProducto(int pk_ventaproductoid, int fk_ventaid, int fk_productoid, int cantidad, double importeProducto) {
+    public VentaProducto(int pk_ventaproductoid, int fk_ventaid, int fk_productoid, int cantidad, double importeProducto) throws SQLException {
         this.pk_ventaproductoid = pk_ventaproductoid;
         this.fk_ventaid = fk_ventaid;
         this.fk_productoid = fk_productoid;
         this.cantidad = cantidad;
         this.importeProducto = importeProducto;
+        
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
     }
 
-    public VentaProducto(int fk_ventaid, int fk_productoid, int cantidad, double importeProducto) {
+    public VentaProducto(int fk_ventaid, int fk_productoid, int cantidad, double importeProducto) throws SQLException {
         this.fk_ventaid = fk_ventaid;
         this.fk_productoid = fk_productoid;
         this.cantidad = cantidad;
         this.importeProducto = importeProducto;
+        
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
     }
 
     public int getPk_ventaproductoid() {
@@ -91,11 +129,34 @@ public class VentaProducto {
     
     public void saveToDatabase() {
         try {
-            String insertSQL = "insert into ventasproductos (fk_ventaid,fk_productoid,cantidad,importeproducto) values ('" + this.fk_ventaid + "','" + this.fk_productoid + "','" + this.cantidad + "','" + this.importeProducto  + "');";
-            System.out.print("Cantidad save to db: " + this.cantidad + " .");
+            
             //Insert product into database after validation           
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            preparedStatement = postgresConnection.prepareStatement("insert into ventasproductos (fk_ventaid,fk_productoid,cantidad,importeproducto) values (?,?,?,?)");
+            preparedStatement.setInt(1, this.fk_ventaid);
+            preparedStatement.setInt(2, this.fk_productoid);
+            preparedStatement.setInt(3, this.cantidad);
+            preparedStatement.setDouble(4, this.importeProducto);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("insert into ventasproductos (fk_ventaid,fk_productoid,cantidad,importeproducto) values (?,?,?,?)");
+            preparedStatement.setInt(1, this.fk_ventaid);
+            preparedStatement.setInt(2, this.fk_productoid);
+            preparedStatement.setInt(3, this.cantidad);
+            preparedStatement.setDouble(4, this.importeProducto);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                System.out.println("Transaction failed.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+                System.out.println("Transaction was successful.");
+            }
+            
         } catch (SQLException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         }

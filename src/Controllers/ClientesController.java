@@ -17,10 +17,34 @@ import javax.swing.table.DefaultTableModel;
  * @author gerardomartinez
  */
 public class ClientesController extends Cliente {
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection postgresConnection = connector.getPostgresConnection();
+    Connection mysqlConnection = connector.getMysqlConnection();
+    PreparedStatement postgresBegin;
+    PreparedStatement postgresCommit;
+    PreparedStatement postgresRollback;
+    PreparedStatement mysqlBegin;
+    PreparedStatement mysqlCommit;
+    PreparedStatement mysqlRollback;
+    PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Statement statement = null;
+    boolean mysql = false;
+    boolean postgres = false;
+    int mysqlCount = 0;
+    int postgresCount = 0;
+    
+    public ClientesController() throws SQLException {
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
+    }
+    
 
     public boolean agregarCliente(String nombre, String apellidoPaterno, String apellidoMaterno, String rfc, String telefono) throws SQLException {
 
@@ -33,9 +57,34 @@ public class ClientesController extends Cliente {
             return true;
         } else {
             //Insert product into database after validation
-            String insertSQL = "INSERT INTO clientes (nombre,apellidoPaterno,apellidoMaterno,rfc,telefono) VALUES ('" + nombre + "','" + apellidoPaterno + "','" + apellidoMaterno + "','" + rfc + "','" + telefono + "');";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            preparedStatement = postgresConnection.prepareStatement("INSERT INTO clientes (nombre,apellidoPaterno,apellidoMaterno,rfc,telefono) VALUES (?,?,?,?,?)");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setString(2, apellidoPaterno);
+            preparedStatement.setString(3, apellidoMaterno);
+            preparedStatement.setString(4, rfc);
+            preparedStatement.setString(5, telefono);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("INSERT INTO clientes (nombre,apellidoPaterno,apellidoMaterno,rfc,telefono) VALUES (?,?,?,?,?)");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setString(2, apellidoPaterno);
+            preparedStatement.setString(3, apellidoMaterno);
+            preparedStatement.setString(4, rfc);
+            preparedStatement.setString(5, telefono);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                System.out.println("Transaction failed.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+                System.out.println("Transaction was successful.");
+            }
+                        
             return false;
         }
     }
@@ -46,15 +95,32 @@ public class ClientesController extends Cliente {
 
         //delete if found
         if (encontrado > 0) {
-            String insertSQL = "DELETE FROM clientes WHERE pk_clienteid = " + encontrado;
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            
+            preparedStatement = postgresConnection.prepareStatement("DELETE FROM clientes WHERE pk_clienteid = ?");
+            preparedStatement.setInt(1, encontrado);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("DELETE FROM clientes WHERE pk_clienteid = ?");
+            preparedStatement.setInt(1, encontrado);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                System.out.println("Transaction failed.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+                System.out.println("Transaction was successful.");
+            }
         }
     }
 
     public int buscarCliente(String nombreCliente) throws SQLException {
         String selectSQL = "SELECT * FROM clientes";
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(selectSQL);
 
         while (resultSet.next()) {
@@ -75,21 +141,46 @@ public class ClientesController extends Cliente {
 
         //delete if found
         if (encontrado > 0) {
-            System.out.print(encontrado);
-            String insertSQL = "UPDATE clientes SET nombre = '" + nombre + "', apellidopaterno = '" + apellidoPaterno + "', apellidomaterno = '" + apellidoMaterno + "', rfc = '" + rfc + "', telefono = '" + telefono + "' WHERE pk_clienteid = " + encontrado;
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+
+            preparedStatement = postgresConnection.prepareStatement("UPDATE clientes SET nombre = ?, apellidopaterno = ?, apellidomaterno = ?, rfc = ?, telefono = ? WHERE pk_clienteid = ?");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setString(2, apellidoPaterno);
+            preparedStatement.setString(3, apellidoMaterno);
+            preparedStatement.setString(4, rfc);
+            preparedStatement.setString(5, telefono);
+            preparedStatement.setInt(6, encontrado);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("UPDATE clientes SET nombre = ?, apellidopaterno = ?, apellidomaterno = ?, rfc = ?, telefono = ? WHERE pk_clienteid = ?");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setString(2, apellidoPaterno);
+            preparedStatement.setString(3, apellidoMaterno);
+            preparedStatement.setString(4, rfc);
+            preparedStatement.setString(5, telefono);
+            preparedStatement.setInt(6, encontrado);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                System.out.println("Transaction failed.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+                System.out.println("Transaction was successful.");
+            }
+
         }
     }
 
     public DefaultTableModel todosClientesDisplay() throws SQLException {
-        Postgres postgres = new Postgres();
-        Connection connection = postgres.connect();
 
         DefaultTableModel model = new DefaultTableModel(new String[]{"Nombre", "Apellido Paterno", "Apellido Materno", "RFC", "Telefono"}, 0);
         String sql = "SELECT * FROM clientes";
 
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {

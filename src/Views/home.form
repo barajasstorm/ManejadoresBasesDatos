@@ -1209,17 +1209,9 @@
                                               </Group>
                                           </Group>
                                       </Group>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" attributes="0">
-                                              <EmptySpace min="-2" pref="135" max="-2" attributes="0"/>
-                                              <Component id="errorYaExiste" min="-2" pref="542" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                              <Component id="successMessage" min="-2" pref="573" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace pref="50" max="32767" attributes="0"/>
+                                      <EmptySpace min="-2" pref="135" max="-2" attributes="0"/>
+                                      <Component id="errorYaExiste" min="-2" pref="542" max="-2" attributes="0"/>
+                                      <EmptySpace pref="66" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1258,11 +1250,10 @@
                                           <Component id="jLabel61" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="inventarioAgregarStock" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace pref="127" max="32767" attributes="0"/>
+                                      <EmptySpace pref="99" max="32767" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="agregarCancelarProductoButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="agregarGuardarProductoButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="successMessage" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
                                   </Group>
@@ -1350,13 +1341,6 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="successMessage">
-                              <Properties>
-                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="0" green="66" red="0" type="rgb"/>
-                                </Property>
-                              </Properties>
-                            </Component>
                           </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="invModificarPanel">
@@ -1383,8 +1367,6 @@
                                               <Component id="jButton11" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="guardarCambioButton" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                              <Component id="successLabel" min="-2" pref="564" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="jLabel62" min="-2" max="-2" attributes="0"/>
                                           <Group type="102" alignment="1" attributes="0">
@@ -1428,7 +1410,7 @@
                                               </Group>
                                           </Group>
                                       </Group>
-                                      <EmptySpace pref="99" max="32767" attributes="0"/>
+                                      <EmptySpace pref="117" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1480,9 +1462,8 @@
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="jButton11" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="guardarCambioButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="successLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace pref="125" max="32767" attributes="0"/>
+                                      <EmptySpace pref="88" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1594,13 +1575,6 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="successLabel">
-                              <Properties>
-                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="0" green="99" red="0" type="rgb"/>
-                                </Property>
-                              </Properties>
-                            </Component>
                           </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="invBorrarPanel">
@@ -1633,34 +1607,30 @@
                                           </Group>
                                           <Component id="jLabel127" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="jLabel128" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Group type="103" groupAlignment="1" attributes="0">
-                                                  <Group type="102" attributes="0">
-                                                      <Component id="jButton15" min="-2" max="-2" attributes="0"/>
-                                                      <EmptySpace max="-2" attributes="0"/>
-                                                      <Component id="borrarButton" min="-2" max="-2" attributes="0"/>
+                                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                                              <Group type="102" attributes="0">
+                                                  <Component id="jButton15" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="borrarButton" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                              <Group type="102" attributes="0">
+                                                  <Group type="103" groupAlignment="0" attributes="0">
+                                                      <Component id="jLabel125" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel126" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   </Group>
-                                                  <Group type="102" attributes="0">
-                                                      <Group type="103" groupAlignment="0" attributes="0">
-                                                          <Component id="jLabel125" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="jLabel126" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                      </Group>
-                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                                          <Component id="borrarNombreField" max="32767" attributes="0"/>
-                                                          <Component id="borrarPCField" alignment="0" max="32767" attributes="0"/>
-                                                          <Component id="borrarPVField" alignment="0" max="32767" attributes="0"/>
-                                                          <Component id="borrarExistenciasField" alignment="0" max="32767" attributes="0"/>
-                                                          <Component id="borrarStockField" alignment="0" pref="157" max="32767" attributes="0"/>
-                                                      </Group>
+                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                                      <Component id="borrarNombreField" max="32767" attributes="0"/>
+                                                      <Component id="borrarPCField" alignment="0" max="32767" attributes="0"/>
+                                                      <Component id="borrarPVField" alignment="0" max="32767" attributes="0"/>
+                                                      <Component id="borrarExistenciasField" alignment="0" max="32767" attributes="0"/>
+                                                      <Component id="borrarStockField" alignment="0" pref="157" max="32767" attributes="0"/>
                                                   </Group>
                                               </Group>
-                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                              <Component id="successBorrado" min="-2" pref="377" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <EmptySpace pref="42" max="32767" attributes="0"/>
+                                      <EmptySpace pref="54" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1701,11 +1671,10 @@
                                           <Component id="jLabel128" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="borrarStockField" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace pref="160" max="32767" attributes="0"/>
+                                      <EmptySpace pref="126" max="32767" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="jButton15" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="borrarButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="successBorrado" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
                                   </Group>
@@ -1812,13 +1781,6 @@
                               <Properties>
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                                   <Color blue="0" green="0" red="ff" type="rgb"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JLabel" name="successBorrado">
-                              <Properties>
-                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="0" green="99" red="0" type="rgb"/>
                                 </Property>
                               </Properties>
                             </Component>

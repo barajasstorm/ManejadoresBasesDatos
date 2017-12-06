@@ -42,17 +42,17 @@ import static jdk.nashorn.internal.objects.NativeRegExp.test;
 public class home extends javax.swing.JFrame {
 
     private boolean loginAttempt = false;
-    ProductoController prodControl = new ProductoController();
+    ProductoController prodControl;
     ClientesController clienControl = new ClientesController();
     ProveedorController provControl = new ProveedorController();
     UsuarioController userControl = new UsuarioController();
-    SearchCombo search = new SearchCombo();
     Usuario tmpUser = new Usuario();
     Usuario currentUser = new Usuario();
     int tmpUserId;
 
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection postgresConnection = connector.getPostgresConnection();
+    Connection mysqlConnection = connector.getMysqlConnection();
     ResultSet resultSet = null;
     Statement statement = null;
 
@@ -78,7 +78,8 @@ public class home extends javax.swing.JFrame {
     /**
      * Creates new form home
      */
-    public home() {
+    public home() throws SQLException {
+        this.prodControl = new ProductoController();
         initComponents();
 
         final JTextField textfield = (JTextField) buscarProductoField.getEditor().getEditorComponent();
@@ -137,7 +138,7 @@ public class home extends javax.swing.JFrame {
 
         try {
             String str = "SELECT nombre FROM productos WHERE nombre  LIKE '" + enteredText + "%'";
-            statement = connection.createStatement();
+            statement = postgresConnection.createStatement();
             resultSet = statement.executeQuery(str);
             while (resultSet.next()) {
                 str1 = resultSet.getString("nombre");
@@ -164,7 +165,7 @@ public class home extends javax.swing.JFrame {
 
         try {
             String str = "SELECT rfc FROM clientes WHERE rfc LIKE '" + enteredText + "%'";
-            statement = connection.createStatement();
+            statement = postgresConnection.createStatement();
             resultSet = statement.executeQuery(str);
             while (resultSet.next()) {
                 str1 = resultSet.getString("rfc");
@@ -191,7 +192,7 @@ public class home extends javax.swing.JFrame {
 
         try {
             String str = "SELECT rfc FROM proveedores WHERE rfc  LIKE '" + enteredText + "%'";
-            statement = connection.createStatement();
+            statement = postgresConnection.createStatement();
             resultSet = statement.executeQuery(str);
             while (resultSet.next()) {
                 str1 = resultSet.getString("rfc");
@@ -218,7 +219,7 @@ public class home extends javax.swing.JFrame {
 
         try {
             String str = "SELECT nombre FROM productos WHERE nombre  LIKE '" + enteredText + "%'";
-            statement = connection.createStatement();
+            statement = postgresConnection.createStatement();
             resultSet = statement.executeQuery(str);
             while (resultSet.next()) {
                 str1 = resultSet.getString("nombre");
@@ -249,7 +250,7 @@ public class home extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jTextField3 = new javax.swing.JTextField();
-        finalPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("finalPU").createEntityManager();
+        finalPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory(null).createEntityManager();
         productosQuery = java.beans.Beans.isDesignTime() ? null : finalPUEntityManager.createQuery("SELECT p FROM Productos p");
         productosList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : productosQuery.getResultList();
         mainMasterPanel = new javax.swing.JPanel();
@@ -332,7 +333,6 @@ public class home extends javax.swing.JFrame {
         agregarCancelarProductoButton = new javax.swing.JButton();
         agregarGuardarProductoButton = new javax.swing.JButton();
         errorYaExiste = new javax.swing.JLabel();
-        successMessage = new javax.swing.JLabel();
         invModificarPanel = new javax.swing.JPanel();
         jLabel62 = new javax.swing.JLabel();
         jLabel63 = new javax.swing.JLabel();
@@ -353,7 +353,6 @@ public class home extends javax.swing.JFrame {
         modBuscarField = new javax.swing.JTextField();
         jButton16 = new javax.swing.JButton();
         errorLabel = new javax.swing.JLabel();
-        successLabel = new javax.swing.JLabel();
         invBorrarPanel = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
         jLabel70 = new javax.swing.JLabel();
@@ -372,7 +371,6 @@ public class home extends javax.swing.JFrame {
         borrarExistenciasField = new javax.swing.JTextField();
         borrarStockField = new javax.swing.JTextField();
         errorBorrar = new javax.swing.JLabel();
-        successBorrado = new javax.swing.JLabel();
         invTodosButton = new javax.swing.JButton();
         invBajosButton = new javax.swing.JButton();
         invAgregarButton = new javax.swing.JButton();
@@ -1408,8 +1406,6 @@ public class home extends javax.swing.JFrame {
 
         errorYaExiste.setForeground(new java.awt.Color(255, 0, 0));
 
-        successMessage.setForeground(new java.awt.Color(0, 102, 0));
-
         javax.swing.GroupLayout invAgregarPanelLayout = new javax.swing.GroupLayout(invAgregarPanel);
         invAgregarPanel.setLayout(invAgregarPanelLayout);
         invAgregarPanelLayout.setHorizontalGroup(
@@ -1445,14 +1441,9 @@ public class home extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(agregarGuardarProductoButton)
                                 .addGap(0, 0, Short.MAX_VALUE)))))
-                .addGroup(invAgregarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(invAgregarPanelLayout.createSequentialGroup()
-                        .addGap(135, 135, 135)
-                        .addComponent(errorYaExiste, javax.swing.GroupLayout.PREFERRED_SIZE, 542, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(invAgregarPanelLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(successMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addGap(135, 135, 135)
+                .addComponent(errorYaExiste, javax.swing.GroupLayout.PREFERRED_SIZE, 542, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(66, Short.MAX_VALUE))
         );
         invAgregarPanelLayout.setVerticalGroup(
             invAgregarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1483,11 +1474,10 @@ public class home extends javax.swing.JFrame {
                 .addGroup(invAgregarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel61)
                     .addComponent(inventarioAgregarStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 127, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
                 .addGroup(invAgregarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(agregarCancelarProductoButton)
-                    .addComponent(agregarGuardarProductoButton)
-                    .addComponent(successMessage))
+                    .addComponent(agregarGuardarProductoButton))
                 .addGap(69, 69, 69))
         );
 
@@ -1543,8 +1533,6 @@ public class home extends javax.swing.JFrame {
 
         errorLabel.setForeground(new java.awt.Color(255, 0, 0));
 
-        successLabel.setForeground(new java.awt.Color(0, 153, 0));
-
         javax.swing.GroupLayout invModificarPanelLayout = new javax.swing.GroupLayout(invModificarPanel);
         invModificarPanel.setLayout(invModificarPanelLayout);
         invModificarPanelLayout.setHorizontalGroup(
@@ -1557,9 +1545,7 @@ public class home extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton11)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guardarCambioButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(successLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 564, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(guardarCambioButton))
                     .addComponent(jLabel62)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, invModificarPanelLayout.createSequentialGroup()
                         .addGroup(invModificarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -1592,7 +1578,7 @@ public class home extends javax.swing.JFrame {
                                 .addComponent(jTextField24)
                                 .addComponent(jTextField22)
                                 .addComponent(jTextField23)))))
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(117, Short.MAX_VALUE))
         );
         invModificarPanelLayout.setVerticalGroup(
             invModificarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1633,9 +1619,8 @@ public class home extends javax.swing.JFrame {
                 .addGap(67, 67, 67)
                 .addGroup(invModificarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton11)
-                    .addComponent(guardarCambioButton)
-                    .addComponent(successLabel))
-                .addContainerGap(125, Short.MAX_VALUE))
+                    .addComponent(guardarCambioButton))
+                .addContainerGap(88, Short.MAX_VALUE))
         );
 
         inventarioSubPanel.add(invModificarPanel, "invModificarPanel");
@@ -1692,8 +1677,6 @@ public class home extends javax.swing.JFrame {
 
         errorBorrar.setForeground(new java.awt.Color(255, 0, 0));
 
-        successBorrado.setForeground(new java.awt.Color(0, 153, 0));
-
         javax.swing.GroupLayout invBorrarPanelLayout = new javax.swing.GroupLayout(invBorrarPanel);
         invBorrarPanel.setLayout(invBorrarPanelLayout);
         invBorrarPanelLayout.setHorizontalGroup(
@@ -1712,27 +1695,24 @@ public class home extends javax.swing.JFrame {
                         .addComponent(errorBorrar, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel127)
                     .addComponent(jLabel128)
-                    .addGroup(invBorrarPanelLayout.createSequentialGroup()
-                        .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(invBorrarPanelLayout.createSequentialGroup()
-                                .addComponent(jButton15)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(borrarButton))
-                            .addGroup(invBorrarPanelLayout.createSequentialGroup()
-                                .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel125)
-                                    .addComponent(jLabel126)
-                                    .addComponent(jLabel2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(borrarNombreField)
-                                    .addComponent(borrarPCField)
-                                    .addComponent(borrarPVField)
-                                    .addComponent(borrarExistenciasField)
-                                    .addComponent(borrarStockField, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(successBorrado, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(42, Short.MAX_VALUE))
+                    .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(invBorrarPanelLayout.createSequentialGroup()
+                            .addComponent(jButton15)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(borrarButton))
+                        .addGroup(invBorrarPanelLayout.createSequentialGroup()
+                            .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel125)
+                                .addComponent(jLabel126)
+                                .addComponent(jLabel2))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(borrarNombreField)
+                                .addComponent(borrarPCField)
+                                .addComponent(borrarPVField)
+                                .addComponent(borrarExistenciasField)
+                                .addComponent(borrarStockField, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)))))
+                .addContainerGap(54, Short.MAX_VALUE))
         );
         invBorrarPanelLayout.setVerticalGroup(
             invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1765,11 +1745,10 @@ public class home extends javax.swing.JFrame {
                 .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel128)
                     .addComponent(borrarStockField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 160, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
                 .addGroup(invBorrarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton15)
-                    .addComponent(borrarButton)
-                    .addComponent(successBorrado, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(borrarButton))
                 .addGap(59, 59, 59))
         );
 
@@ -3960,20 +3939,24 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_provBorrarButtonActionPerformed
 
     private void confUsuariosPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confUsuariosPanelActionPerformed
-        // TODO add your handling code here:
-        CardLayout card = (CardLayout) configuracionSubPanel.getLayout();
-        card.show(configuracionSubPanel, "configuracionUsuariosPanel");
-        CardLayout card2 = (CardLayout) configuracionUsuariosPanel.getLayout();
-        card2.show(configuracionUsuariosPanel, "todosUsuariosPanel");
-
-        UsuarioController userControl = new UsuarioController();
-        DefaultTableModel model = null;
-        try {
-            model = userControl.todosUsuariosDisplay();
+        try {                                                  
+            // TODO add your handling code here:
+            CardLayout card = (CardLayout) configuracionSubPanel.getLayout();
+            card.show(configuracionSubPanel, "configuracionUsuariosPanel");
+            CardLayout card2 = (CardLayout) configuracionUsuariosPanel.getLayout();
+            card2.show(configuracionUsuariosPanel, "todosUsuariosPanel");
+            
+            UsuarioController userControl = new UsuarioController();
+            DefaultTableModel model = null;
+            try {
+                model = userControl.todosUsuariosDisplay();
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            tableUsuarios.setModel(model);
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
-        tableUsuarios.setModel(model);
     }//GEN-LAST:event_confUsuariosPanelActionPerformed
 
     private void confTicketPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confTicketPanelActionPerformed
@@ -4020,24 +4003,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField31ActionPerformed
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
-        // TODO add your handling code here:
-        ProveedorController borrarProv = new ProveedorController();
-        try {
-            if (borrarProv.buscarProveedor(boProveedorBuscarField.getText()) > 0) {
-                try {
-                    borrarProv.borrarProveedor(boProveedorBuscarField.getText());
-                    boProveedorSuccess.setText("Borrado exitosamente!");
-                    jTextField4.setText("");
-                    jTextField5.setText("");
-                    jTextField6.setText("");
-                    jTextField7.setText("");
-                    jTextField13.setText("");
-                    boProveedorBuscarField.setText("");
-                } catch (SQLException ex) {
-                    Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+        try {                                          
+            // TODO add your handling code here:
+            ProveedorController borrarProv = new ProveedorController();
+            try {
+                if (borrarProv.buscarProveedor(boProveedorBuscarField.getText()) > 0) {
+                    try {
+                        borrarProv.borrarProveedor(boProveedorBuscarField.getText());
+                        boProveedorSuccess.setText("Borrado exitosamente!");
+                        jTextField4.setText("");
+                        jTextField5.setText("");
+                        jTextField6.setText("");
+                        jTextField7.setText("");
+                        jTextField13.setText("");
+                        boProveedorBuscarField.setText("");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    boProveedorError.setText("Favor de indicar proveedor a borrar.");
                 }
-            } else {
-                boProveedorError.setText("Favor de indicar proveedor a borrar.");
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4109,39 +4096,67 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_iniciarButtonMousePressed
 
     private void iniciarButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_iniciarButtonMouseReleased
-        // TODO add your handling code here:
-        ImageIcon II = new ImageIcon(getClass().getResource("/Images/Iniciar_Hover.png"));
-        iniciarButton.setIcon(II);
-
-        Postgres postgres = new Postgres();
-        loginAttempt = postgres.login(usernameField.getText(), passwordField.getText());
-        if (loginAttempt) {
-            try {
-                //Set today's at cortes page
-                jLabel19.setText(dtfday.format(localDate) + "/" + dtfmonth.format(localDate) + "/" + dtfyear.format(localDate));
-
-                //Set currentUser object to the current user
-                int userid;
-                userid = userControl.buscarUsuario(usernameField.getText());
-                currentUser.loadUserDetails(userid);
-
-                //Calculate next ticket number
-                ventaControl.siguienteTicket();
-                corteControl.numeroCorte();
-
-                //Set sales screen to display new sales ticket number              
-                jLabel18.setText(String.valueOf(ventaControl.getTicketNumero()));
-
-                //Set corte page to display username
-                jLabel106.setText(currentUser.getNombre() + " " + currentUser.getApellidoPaterno() + " " + currentUser.getApellidoMaterno());
-
-                CardLayout card = (CardLayout) mainMasterPanel.getLayout();
-                card.show(mainMasterPanel, "applicationPanel");
-            } catch (SQLException ex) {
-                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            // TODO add your handling code here:
+            ImageIcon II = new ImageIcon(getClass().getResource("/Images/Iniciar_Hover.png"));
+            iniciarButton.setIcon(II);
+           
+            String stringSQL = "SELECT * FROM usuarios";
+            statement = postgresConnection.createStatement();
+            resultSet = statement.executeQuery(stringSQL);
+            
+            while(resultSet.next()) {
+                if (resultSet.getString("username").equals(usernameField.getText()) && resultSet.getString("password").equals(passwordField.getText())) {
+                    loginAttempt = true;
+                    break;
+                } else {
+                    loginAttempt = false;
+                }
             }
-        } else {
-            errorLogin.setText("Usuario o Contraseña No Validos. Favor de Intentar de Nuevo.");
+            
+            statement = mysqlConnection.createStatement();
+            resultSet = statement.executeQuery(stringSQL);
+            
+            while(resultSet.next()) {
+                if (resultSet.getString("username").equals(usernameField.getText()) && resultSet.getString("password").equals(passwordField.getText())) {
+                    loginAttempt = true;
+                    break;
+                } else {
+                    loginAttempt = false;
+                }
+            }         
+            loginAttempt = true;
+                                
+            if (loginAttempt) {
+                try {
+                    //Set today's at cortes page
+                    jLabel19.setText(dtfday.format(localDate) + "/" + dtfmonth.format(localDate) + "/" + dtfyear.format(localDate));
+                    
+                    //Set currentUser object to the current user
+                    int userid;
+                    userid = userControl.buscarUsuario(usernameField.getText());
+                    currentUser.loadUserDetails(userid);
+                    
+                    //Calculate next ticket number
+                    ventaControl.siguienteTicket();
+                    corteControl.numeroCorte();
+                    
+                    //Set sales screen to display new sales ticket number
+                    jLabel18.setText(String.valueOf(ventaControl.getTicketNumero()));
+                    
+                    //Set corte page to display username
+                    jLabel106.setText(currentUser.getNombre() + " " + currentUser.getApellidoPaterno() + " " + currentUser.getApellidoMaterno());
+                    
+                    CardLayout card = (CardLayout) mainMasterPanel.getLayout();
+                    card.show(mainMasterPanel, "applicationPanel");
+                } catch (SQLException ex) {
+                    Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                errorLogin.setText("Error al iniciar sesion.");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_iniciarButtonMouseReleased
@@ -4396,21 +4411,25 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_comprasLabelMouseReleased
 
     private void configuracionLabelMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_configuracionLabelMousePressed
-        // TODO add your handling code here:
-        ImageIcon II = new ImageIcon(getClass().getResource("/Images/Header_Pressed_Configuracion.png"));
-        headerBackgroundImage.setIcon(II);
-        CardLayout card = (CardLayout) mainPanel.getLayout();
-        card.show(mainPanel, "configuracionPanel");
-        CardLayout card2 = (CardLayout) configuracionSubPanel.getLayout();
-        card2.show(configuracionSubPanel, "configuracionUsuariosPanel");
-        UsuarioController userControl = new UsuarioController();
-        DefaultTableModel model = null;
-        try {
-            model = userControl.todosUsuariosDisplay();
+        try {                                                
+            // TODO add your handling code here:
+            ImageIcon II = new ImageIcon(getClass().getResource("/Images/Header_Pressed_Configuracion.png"));
+            headerBackgroundImage.setIcon(II);
+            CardLayout card = (CardLayout) mainPanel.getLayout();
+            card.show(mainPanel, "configuracionPanel");
+            CardLayout card2 = (CardLayout) configuracionSubPanel.getLayout();
+            card2.show(configuracionSubPanel, "configuracionUsuariosPanel");
+            UsuarioController userControl = new UsuarioController();
+            DefaultTableModel model = null;
+            try {
+                model = userControl.todosUsuariosDisplay();
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            tableUsuarios.setModel(model);
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
-        tableUsuarios.setModel(model);
     }//GEN-LAST:event_configuracionLabelMousePressed
 
     private void configuracionLabelMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_configuracionLabelMouseReleased
@@ -4431,14 +4450,14 @@ public class home extends javax.swing.JFrame {
             jLabel140.setText(String.valueOf(corteControl.getCorteNumero()));
 
             //sets corte page display
-            ResultSet resultSet;
-            Statement statement;
+            //ResultSet resultSet;
+            //Statement statement;
             double ventasTotales = 0;
             int cantidadTickets = 0;
             int numeroProductosVendidos = 0;
 
             String selectSQL = "SELECT * FROM ventas WHERE fk_corteid = " + corteControl.getCorteNumero();
-            statement = connection.createStatement();
+            statement = postgresConnection.createStatement();
             resultSet = statement.executeQuery(selectSQL);
 
             while (resultSet.next()) {
@@ -4483,21 +4502,26 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_iniciarButtonMouseClicked
 
     private void agregarGuardarProductoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarGuardarProductoButtonActionPerformed
-        boolean error = false;
-        ProductoController agProd = new ProductoController();
-        try {
-            error = agProd.agregarProducto(inventarioAgregarNombre.getText(), Double.parseDouble(inventarioAgregarPC.getText()), Double.parseDouble(inventarioAgregarPV.getText()), Integer.parseInt(inventarioAgregarExistencias.getText()), Integer.parseInt(inventarioAgregarStock.getText()));
-            if (error) {
-                errorYaExiste.setText("El articulo ya se encuentra en inventario");
-            } else {
-                successMessage.setText("Producto agregado exitosamente");
-                inventarioAgregarNombre.setText("");
-                inventarioAgregarPC.setText("");
-                inventarioAgregarPV.setText("");
-                inventarioAgregarExistencias.setText("");
-                inventarioAgregarStock.setText("");
-                errorYaExiste.setText("");
+        try {                                                             
+            boolean error = false;
+            ProductoController agProd = new ProductoController();
+            try {
+                error = agProd.agregarProducto(inventarioAgregarNombre.getText(), Double.parseDouble(inventarioAgregarPC.getText()), Double.parseDouble(inventarioAgregarPV.getText()), Integer.parseInt(inventarioAgregarExistencias.getText()), Integer.parseInt(inventarioAgregarStock.getText()));
+                if (error) {
+                    errorYaExiste.setText("El articulo ya se encuentra en inventario");
+                } else {
+                    inventarioAgregarNombre.setText("");
+                    inventarioAgregarPC.setText("");
+                    inventarioAgregarPV.setText("");
+                    inventarioAgregarExistencias.setText("");
+                    inventarioAgregarStock.setText("");
+                    errorYaExiste.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -4512,24 +4536,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_agregarCancelarProductoButtonActionPerformed
 
     private void borrarBuscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrarBuscarButtonActionPerformed
-        // TODO add your handling code here:
-        ProductoController prod = new ProductoController();
-        errorBorrar.setText("");
-        try {
-            if (prod.buscarProducto(productoBorrarField.getText()) > 0) {
-                System.out.print(prod.getPk_ProductoId());
-                borrarNombreField.setText(prod.getNombre());
-                borrarPCField.setText(String.valueOf(prod.getPrecioCompra()));
-                borrarPVField.setText(String.valueOf(prod.getPrecioVenta()));
-                borrarExistenciasField.setText(String.valueOf(prod.getExistencias()));
-                borrarStockField.setText(String.valueOf(prod.getStockMin()));
-            } else {
-                errorBorrar.setText("Producto No Encontrado");
-                borrarNombreField.setText("");
-                borrarPCField.setText("");
-                borrarPVField.setText("");
-                borrarExistenciasField.setText("");
-                borrarStockField.setText("");
+        try {                                                   
+            // TODO add your handling code here:
+            ProductoController prod = new ProductoController();
+            errorBorrar.setText("");
+            try {
+                if (prod.buscarProducto(productoBorrarField.getText()) > 0) {
+                    System.out.print(prod.getPk_ProductoId());
+                    borrarNombreField.setText(prod.getNombre());
+                    borrarPCField.setText(String.valueOf(prod.getPrecioCompra()));
+                    borrarPVField.setText(String.valueOf(prod.getPrecioVenta()));
+                    borrarExistenciasField.setText(String.valueOf(prod.getExistencias()));
+                    borrarStockField.setText(String.valueOf(prod.getStockMin()));
+                } else {
+                    errorBorrar.setText("Producto No Encontrado");
+                    borrarNombreField.setText("");
+                    borrarPCField.setText("");
+                    borrarPVField.setText("");
+                    borrarExistenciasField.setText("");
+                    borrarStockField.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4537,26 +4565,29 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_borrarBuscarButtonActionPerformed
 
     private void borrarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrarButtonActionPerformed
-        // TODO add your handling code here:
-        ProductoController borrarProd = new ProductoController();
-        try {
-            if (borrarProd.buscarProducto(borrarNombreField.getText()) > 0) {
-                System.out.print(borrarProd.getPk_ProductoId());
-                try {
-                    borrarProd.borrarProducto(borrarNombreField.getText());
-                    successBorrado.setText("Borrado exitosamente!");
-                    errorBorrar.setText("");
-                    borrarNombreField.setText("");
-                    borrarPCField.setText("");
-                    borrarPVField.setText("");
-                    borrarExistenciasField.setText("");
-                    borrarStockField.setText("");
-                    productoBorrarField.setText("");
-                } catch (SQLException ex) {
-                    Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+        try {                                             
+            // TODO add your handling code here:
+            ProductoController borrarProd = new ProductoController();
+            try {
+                if (borrarProd.buscarProducto(borrarNombreField.getText()) > 0) {
+                    System.out.print(borrarProd.getPk_ProductoId());
+                    try {
+                        borrarProd.borrarProducto(borrarNombreField.getText());
+                        errorBorrar.setText("");
+                        borrarNombreField.setText("");
+                        borrarPCField.setText("");
+                        borrarPVField.setText("");
+                        borrarExistenciasField.setText("");
+                        borrarStockField.setText("");
+                        productoBorrarField.setText("");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    errorBorrar.setText("Favor de indicar producto a borrar.");
                 }
-            } else {
-                errorBorrar.setText("Favor de indicar producto a borrar.");
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4564,26 +4595,29 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_borrarButtonActionPerformed
 
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
-        // TODO add your handling code here:
-        ProductoController prod = new ProductoController();
-        errorLabel.setText("");
-        successLabel.setText("");
-        try {
-            if (prod.buscarProducto(modBuscarField.getText()) > 0) {
-                jTextField19.setText(String.valueOf(prod.buscarProducto(modBuscarField.getText())));
-                jTextField20.setText(prod.getNombre());
-                jTextField21.setText(String.valueOf(prod.getPrecioCompra()));
-                jTextField22.setText(String.valueOf(prod.getPrecioVenta()));
-                jTextField23.setText(String.valueOf(prod.getExistencias()));
-                jTextField24.setText(String.valueOf(prod.getStockMin()));
-            } else {
-                errorLabel.setText("Producto No Encontrado");
-                jTextField19.setText("");
-                jTextField20.setText("");
-                jTextField21.setText("");
-                jTextField22.setText("");
-                jTextField23.setText("");
-                jTextField24.setText("");
+        try {                                          
+            // TODO add your handling code here:
+            ProductoController prod = new ProductoController();
+            errorLabel.setText("");
+            try {
+                if (prod.buscarProducto(modBuscarField.getText()) > 0) {
+                    jTextField19.setText(String.valueOf(prod.buscarProducto(modBuscarField.getText())));
+                    jTextField20.setText(prod.getNombre());
+                    jTextField21.setText(String.valueOf(prod.getPrecioCompra()));
+                    jTextField22.setText(String.valueOf(prod.getPrecioVenta()));
+                    jTextField23.setText(String.valueOf(prod.getExistencias()));
+                    jTextField24.setText(String.valueOf(prod.getStockMin()));
+                } else {
+                    errorLabel.setText("Producto No Encontrado");
+                    jTextField19.setText("");
+                    jTextField20.setText("");
+                    jTextField21.setText("");
+                    jTextField22.setText("");
+                    jTextField23.setText("");
+                    jTextField24.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4595,7 +4629,6 @@ public class home extends javax.swing.JFrame {
         CardLayout card = (CardLayout) inventarioSubPanel.getLayout();
         card.show(inventarioSubPanel, "invAgregarPanel");
         errorYaExiste.setText("");
-        successMessage.setText("");
     }//GEN-LAST:event_invAgregarButtonActionPerformed
 
     private void invModificarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_invModificarButtonActionPerformed
@@ -4609,7 +4642,6 @@ public class home extends javax.swing.JFrame {
         CardLayout card = (CardLayout) inventarioSubPanel.getLayout();
         card.show(inventarioSubPanel, "invBorrarPanel");
         errorBorrar.setText("");
-        successBorrado.setText("");
     }//GEN-LAST:event_invBorrarButtonActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
@@ -4626,22 +4658,25 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void guardarCambioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarCambioButtonActionPerformed
-        // TODO add your handling code here:
-
-        ProductoController modProd = new ProductoController();
-        try {
-            if (jTextField19.getText().equals("")) {
-                errorLabel.setText("Favor de indicar producto a modificar.");
-            } else {
-                modProd.modificarProducto(jTextField20.getText(), Double.parseDouble(jTextField21.getText()), Double.parseDouble(jTextField22.getText()), Integer.parseInt(jTextField23.getText()), Integer.parseInt(jTextField24.getText()));
-                successLabel.setText("Producto modificado exitosamente");
-                modBuscarField.setText("");
-                jTextField19.setText("");
-                jTextField20.setText("");
-                jTextField21.setText("");
-                jTextField22.setText("");
-                jTextField23.setText("");
-                jTextField24.setText("");
+        try {                                                    
+            // TODO add your handling code here:
+            
+            ProductoController modProd = new ProductoController();
+            try {
+                if (jTextField19.getText().equals("")) {
+                    errorLabel.setText("Favor de indicar producto a modificar.");
+                } else {
+                    modProd.modificarProducto(jTextField20.getText(), Double.parseDouble(jTextField21.getText()), Double.parseDouble(jTextField22.getText()), Integer.parseInt(jTextField23.getText()), Integer.parseInt(jTextField24.getText()));
+                    modBuscarField.setText("");
+                    jTextField19.setText("");
+                    jTextField20.setText("");
+                    jTextField21.setText("");
+                    jTextField22.setText("");
+                    jTextField23.setText("");
+                    jTextField24.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4657,22 +4692,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_inventarioAgregarNombreActionPerformed
 
     private void clienteGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clienteGuardarActionPerformed
-        // TODO add your handling code here:
-        boolean error = false;
-        ClientesController clienControl = new ClientesController();
-        try {
-            error = clienControl.agregarCliente(clienteNombre.getText(), clienteApellidoPaterno.getText(), clienteApellidoMaterno.getText(), clienteRfc.getText(), clienteTelefono.getText());
-            if (error) {
-                agClienteError.setText("El cliente ya se encuentra en registrado en el sistema");
-            } else {
-                agClienteSuccess.setText("Cliente agregado a la lista de contacto");
-                clienteNombre.setText("");
-                clienteApellidoPaterno.setText("");
-                clienteApellidoMaterno.setText("");
-                clienteRfc.setText("");
-                clienteTelefono.setText("");
-                agClienteError.setText("");
+        try {                                               
+            // TODO add your handling code here:
+            boolean error = false;
+            ClientesController clienControl = new ClientesController();
+            try {
+                error = clienControl.agregarCliente(clienteNombre.getText(), clienteApellidoPaterno.getText(), clienteApellidoMaterno.getText(), clienteRfc.getText(), clienteTelefono.getText());
+                if (error) {
+                    agClienteError.setText("El cliente ya se encuentra en registrado en el sistema");
+                } else {
+                    agClienteSuccess.setText("Cliente agregado a la lista de contacto");
+                    clienteNombre.setText("");
+                    clienteApellidoPaterno.setText("");
+                    clienteApellidoMaterno.setText("");
+                    clienteRfc.setText("");
+                    clienteTelefono.setText("");
+                    agClienteError.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -4685,20 +4726,24 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_clienteTelefonoActionPerformed
 
     private void guardarProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarProveedorActionPerformed
-        boolean error = false;
-        ProveedorController provControl = new ProveedorController();
-        try {
-            error = provControl.agregarProveedor(nombreProveedor.getText(), apellidoPaternoProveedor.getText(), apellidoMaternoProveedor.getText(), rfcProveedor.getText(), telefonoProveedor.getText());
-            if (error) {
-                aPError.setText("El proveedor ya se encuentra en registrado en el sistema");
-            } else {
-                aPSuccess.setText("Proveedor agregado a la lista de contacto");
-                nombreProveedor.setText("");
-                apellidoPaternoProveedor.setText("");
-                apellidoMaternoProveedor.setText("");
-                rfcProveedor.setText("");
-                telefonoProveedor.setText("");
-                aPError.setText("");
+        try {                                                 
+            boolean error = false;
+            ProveedorController provControl = new ProveedorController();
+            try {
+                error = provControl.agregarProveedor(nombreProveedor.getText(), apellidoPaternoProveedor.getText(), apellidoMaternoProveedor.getText(), rfcProveedor.getText(), telefonoProveedor.getText());
+                if (error) {
+                    aPError.setText("El proveedor ya se encuentra en registrado en el sistema");
+                } else {
+                    aPSuccess.setText("Proveedor agregado a la lista de contacto");
+                    nombreProveedor.setText("");
+                    apellidoPaternoProveedor.setText("");
+                    apellidoMaternoProveedor.setText("");
+                    rfcProveedor.setText("");
+                    telefonoProveedor.setText("");
+                    aPError.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4714,24 +4759,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField6ActionPerformed
 
     private void modProveedorBuscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modProveedorBuscarButtonActionPerformed
-        // TODO add your handling code here:
-        ProveedorController prov = new ProveedorController();
-        mProveedorError.setText("");
-        mProveedorSuccess.setText("");
-        try {
-            if (prov.buscarProveedor(modProveedorBuscarField.getText()) > 0) {
-                jTextField30.setText(prov.getNombre());
-                jTextField31.setText(prov.getApellidoPaterno());
-                jTextField32.setText(prov.getApellidoMaterno());
-                jTextField33.setText(prov.getRfc());
-                jTextField34.setText(prov.getTelefono());
-            } else {
-                mProveedorError.setText("Proveedor No Encontrado");
-                jTextField30.setText("");
-                jTextField31.setText("");
-                jTextField32.setText("");
-                jTextField33.setText("");
-                jTextField34.setText("");
+        try {                                                         
+            // TODO add your handling code here:
+            ProveedorController prov = new ProveedorController();
+            mProveedorError.setText("");
+            mProveedorSuccess.setText("");
+            try {
+                if (prov.buscarProveedor(modProveedorBuscarField.getText()) > 0) {
+                    jTextField30.setText(prov.getNombre());
+                    jTextField31.setText(prov.getApellidoPaterno());
+                    jTextField32.setText(prov.getApellidoMaterno());
+                    jTextField33.setText(prov.getRfc());
+                    jTextField34.setText(prov.getTelefono());
+                } else {
+                    mProveedorError.setText("Proveedor No Encontrado");
+                    jTextField30.setText("");
+                    jTextField31.setText("");
+                    jTextField32.setText("");
+                    jTextField33.setText("");
+                    jTextField34.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4739,20 +4788,24 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_modProveedorBuscarButtonActionPerformed
 
     private void jButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton20ActionPerformed
-        // TODO add your handling code here:
-        ProveedorController modProv = new ProveedorController();
-        try {
-            if (jTextField30.getText().equals("")) {
-                mProveedorError.setText("Favor de indicar proveedor a modificar.");
-            } else {
-                modProv.modificarProveedor(jTextField30.getText(), jTextField31.getText(), jTextField32.getText(), jTextField33.getText(), jTextField34.getText());
-                mProveedorSuccess.setText("Producto modificado exitosamente");
-                modProveedorBuscarField.setText("");
-                jTextField30.setText("");
-                jTextField31.setText("");
-                jTextField32.setText("");
-                jTextField33.setText("");
-                jTextField34.setText("");
+        try {                                          
+            // TODO add your handling code here:
+            ProveedorController modProv = new ProveedorController();
+            try {
+                if (jTextField30.getText().equals("")) {
+                    mProveedorError.setText("Favor de indicar proveedor a modificar.");
+                } else {
+                    modProv.modificarProveedor(jTextField30.getText(), jTextField31.getText(), jTextField32.getText(), jTextField33.getText(), jTextField34.getText());
+                    mProveedorSuccess.setText("Producto modificado exitosamente");
+                    modProveedorBuscarField.setText("");
+                    jTextField30.setText("");
+                    jTextField31.setText("");
+                    jTextField32.setText("");
+                    jTextField33.setText("");
+                    jTextField34.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4760,24 +4813,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton20ActionPerformed
 
     private void boProveedorBuscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boProveedorBuscarButtonActionPerformed
-        // TODO add your handling code here:
-        ProveedorController prov = new ProveedorController();
-        boProveedorError.setText("");
-        boProveedorSuccess.setText("");
-        try {
-            if (prov.buscarProveedor(boProveedorBuscarField.getText()) > 0) {
-                jTextField4.setText(prov.getNombre());
-                jTextField5.setText(prov.getApellidoPaterno());
-                jTextField6.setText(prov.getApellidoMaterno());
-                jTextField7.setText(prov.getRfc());
-                jTextField13.setText(prov.getTelefono());
-            } else {
-                boProveedorError.setText("Proveedor No Encontrado");
-                jTextField4.setText("");
-                jTextField5.setText("");
-                jTextField6.setText("");
-                jTextField7.setText("");
-                jTextField13.setText("");
+        try {                                                        
+            // TODO add your handling code here:
+            ProveedorController prov = new ProveedorController();
+            boProveedorError.setText("");
+            boProveedorSuccess.setText("");
+            try {
+                if (prov.buscarProveedor(boProveedorBuscarField.getText()) > 0) {
+                    jTextField4.setText(prov.getNombre());
+                    jTextField5.setText(prov.getApellidoPaterno());
+                    jTextField6.setText(prov.getApellidoMaterno());
+                    jTextField7.setText(prov.getRfc());
+                    jTextField13.setText(prov.getTelefono());
+                } else {
+                    boProveedorError.setText("Proveedor No Encontrado");
+                    jTextField4.setText("");
+                    jTextField5.setText("");
+                    jTextField6.setText("");
+                    jTextField7.setText("");
+                    jTextField13.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4819,24 +4876,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_mClienteBuscarFieldActionPerformed
 
     private void mClienteBuscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mClienteBuscarButtonActionPerformed
-        // TODO add your handling code here:
-        ClientesController clien = new ClientesController();
-        mClienteError.setText("");
-        mClienteSuccess.setText("");
-        try {
-            if (clien.buscarCliente(mClienteBuscarField.getText()) > 0) {
-                jTextField8.setText(clien.getNombre());
-                jTextField9.setText(clien.getApellidoPaterno());
-                jTextField10.setText(clien.getApellidoMaterno());
-                jTextField11.setText(clien.getRfc());
-                jTextField12.setText(clien.getTelefono());
-            } else {
-                mClienteError.setText("Cliente No Encontrado");
-                jTextField8.setText("");
-                jTextField9.setText("");
-                jTextField10.setText("");
-                jTextField11.setText("");
-                jTextField12.setText("");
+        try {                                                     
+            // TODO add your handling code here:
+            ClientesController clien = new ClientesController();
+            mClienteError.setText("");
+            mClienteSuccess.setText("");
+            try {
+                if (clien.buscarCliente(mClienteBuscarField.getText()) > 0) {
+                    jTextField8.setText(clien.getNombre());
+                    jTextField9.setText(clien.getApellidoPaterno());
+                    jTextField10.setText(clien.getApellidoMaterno());
+                    jTextField11.setText(clien.getRfc());
+                    jTextField12.setText(clien.getTelefono());
+                } else {
+                    mClienteError.setText("Cliente No Encontrado");
+                    jTextField8.setText("");
+                    jTextField9.setText("");
+                    jTextField10.setText("");
+                    jTextField11.setText("");
+                    jTextField12.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4844,20 +4905,24 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_mClienteBuscarButtonActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // TODO add your handling code here:
-        ClientesController clien = new ClientesController();
-        try {
-            if (jTextField8.getText().equals("")) {
-                mClienteError.setText("Favor de indicar cliente a modificar.");
-            } else {
-                clien.modificarCliente(jTextField8.getText(), jTextField9.getText(), jTextField10.getText(), jTextField11.getText(), jTextField12.getText());
-                mClienteSuccess.setText("Cliente modificado exitosamente");
-                mClienteBuscarField.setText("");
-                jTextField8.setText("");
-                jTextField9.setText("");
-                jTextField10.setText("");
-                jTextField11.setText("");
-                jTextField12.setText("");
+        try {                                         
+            // TODO add your handling code here:
+            ClientesController clien = new ClientesController();
+            try {
+                if (jTextField8.getText().equals("")) {
+                    mClienteError.setText("Favor de indicar cliente a modificar.");
+                } else {
+                    clien.modificarCliente(jTextField8.getText(), jTextField9.getText(), jTextField10.getText(), jTextField11.getText(), jTextField12.getText());
+                    mClienteSuccess.setText("Cliente modificado exitosamente");
+                    mClienteBuscarField.setText("");
+                    jTextField8.setText("");
+                    jTextField9.setText("");
+                    jTextField10.setText("");
+                    jTextField11.setText("");
+                    jTextField12.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4865,24 +4930,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void bClienteBuscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClienteBuscarButtonActionPerformed
-        // TODO add your handling code here:
-        ClientesController clien = new ClientesController();
-        bClienteError.setText("");
-        bClienteSuccess.setText("");
-        try {
-            if (clien.buscarCliente(bClienteBuscarField.getText()) > 0) {
-                jTextField15.setText(clien.getNombre());
-                jTextField16.setText(clien.getApellidoPaterno());
-                jTextField17.setText(clien.getApellidoMaterno());
-                jTextField18.setText(clien.getRfc());
-                jTextField25.setText(clien.getTelefono());
-            } else {
-                bClienteError.setText("Cliente No Encontrado");
-                jTextField15.setText("");
-                jTextField16.setText("");
-                jTextField17.setText("");
-                jTextField18.setText("");
-                jTextField19.setText("");
+        try {                                                     
+            // TODO add your handling code here:
+            ClientesController clien = new ClientesController();
+            bClienteError.setText("");
+            bClienteSuccess.setText("");
+            try {
+                if (clien.buscarCliente(bClienteBuscarField.getText()) > 0) {
+                    jTextField15.setText(clien.getNombre());
+                    jTextField16.setText(clien.getApellidoPaterno());
+                    jTextField17.setText(clien.getApellidoMaterno());
+                    jTextField18.setText(clien.getRfc());
+                    jTextField25.setText(clien.getTelefono());
+                } else {
+                    bClienteError.setText("Cliente No Encontrado");
+                    jTextField15.setText("");
+                    jTextField16.setText("");
+                    jTextField17.setText("");
+                    jTextField18.setText("");
+                    jTextField19.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -4890,24 +4959,28 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_bClienteBuscarButtonActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        // TODO add your handling code here:
-        ClientesController clien = new ClientesController();
-        try {
-            if (clien.buscarCliente(bClienteBuscarField.getText()) > 0) {
-                try {
-                    clien.borrarCliente(bClienteBuscarField.getText());
-                    bClienteSuccess.setText("Borrado exitosamente!");
-                    jTextField15.setText("");
-                    jTextField16.setText("");
-                    jTextField17.setText("");
-                    jTextField18.setText("");
-                    jTextField25.setText("");
-                    bClienteBuscarField.setText("");
-                } catch (SQLException ex) {
-                    Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+        try {                                          
+            // TODO add your handling code here:
+            ClientesController clien = new ClientesController();
+            try {
+                if (clien.buscarCliente(bClienteBuscarField.getText()) > 0) {
+                    try {
+                        clien.borrarCliente(bClienteBuscarField.getText());
+                        bClienteSuccess.setText("Borrado exitosamente!");
+                        jTextField15.setText("");
+                        jTextField16.setText("");
+                        jTextField17.setText("");
+                        jTextField18.setText("");
+                        jTextField25.setText("");
+                        bClienteBuscarField.setText("");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    bClienteError.setText("Favor de indicar cliente a borrar.");
                 }
-            } else {
-                bClienteError.setText("Favor de indicar cliente a borrar.");
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
@@ -5005,22 +5078,27 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
-        // TODO add your handling code here:
-        boolean error = false;
-        UsuarioController userControl = new UsuarioController();
-        try {
-            error = userControl.agregarUsuario(jTextField14.getText(), jPasswordField1.getText(), jTextField27.getText(), jTextField28.getText(), jTextField29.getText());
-            if (error) {
-                aUsuarioError.setText("El usuario ya se encuentra en registrado en el sistema");
-            } else {
-                aUsuarioSuccess.setText("Usuario agregado a la lista de usuarios");
-                jTextField14.setText("");
-                jPasswordField1.setText("");
-                jTextField27.setText("");
-                jTextField28.setText("");
-                jTextField29.setText("");
-                aUsuarioError.setText("");
+        try {                                          
+            // TODO add your handling code here:
+            boolean error = false;
+            UsuarioController userControl = new UsuarioController();
+            try {
+                error = userControl.agregarUsuario(jTextField14.getText(), jPasswordField1.getText(), jTextField27.getText(), jTextField28.getText(), jTextField29.getText());
+                if (error) {
+                    aUsuarioError.setText("El usuario ya se encuentra en registrado en el sistema");
+                } else {
+                    aUsuarioSuccess.setText("Usuario agregado a la lista de usuarios");
+                    jTextField14.setText("");
+                    jPasswordField1.setText("");
+                    jTextField27.setText("");
+                    jTextField28.setText("");
+                    jTextField29.setText("");
+                    aUsuarioError.setText("");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -5028,31 +5106,35 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton25ActionPerformed
 
     private void jButton27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton27ActionPerformed
-        // TODO add your handling code here:
-        UsuarioController userControl = new UsuarioController();
-        try {
-            userControl.modificarUsuario(Integer.parseInt(mUsuarioID.getText()), jTextField26.getText(), jPasswordField2.getText(), jTextField35.getText(), jTextField43.getText(), jTextField44.getText());
-            jTextField26.setText("");
-            jPasswordField2.setText("");
-            jTextField35.setText("");
-            jTextField43.setText("");
-            jTextField44.setText("");
-            mUsuarioID.setText("");
-
+        try {                                          
+            // TODO add your handling code here:
+            UsuarioController userControl = new UsuarioController();
+            try {
+                userControl.modificarUsuario(Integer.parseInt(mUsuarioID.getText()), jTextField26.getText(), jPasswordField2.getText(), jTextField35.getText(), jTextField43.getText(), jTextField44.getText());
+                jTextField26.setText("");
+                jPasswordField2.setText("");
+                jTextField35.setText("");
+                jTextField43.setText("");
+                jTextField44.setText("");
+                mUsuarioID.setText("");
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            CardLayout card = (CardLayout) configuracionSubPanel.getLayout();
+            card.show(configuracionSubPanel, "configuracionUsuariosPanel");
+            CardLayout card2 = (CardLayout) configuracionUsuariosPanel.getLayout();
+            card2.show(configuracionUsuariosPanel, "todosUsuariosPanel");
+            DefaultTableModel model = null;
+            try {
+                model = userControl.todosUsuariosDisplay();
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            tableUsuarios.setModel(model);
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
-        CardLayout card = (CardLayout) configuracionSubPanel.getLayout();
-        card.show(configuracionSubPanel, "configuracionUsuariosPanel");
-        CardLayout card2 = (CardLayout) configuracionUsuariosPanel.getLayout();
-        card2.show(configuracionUsuariosPanel, "todosUsuariosPanel");
-        DefaultTableModel model = null;
-        try {
-            model = userControl.todosUsuariosDisplay();
-        } catch (SQLException ex) {
-            Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        tableUsuarios.setModel(model);
     }//GEN-LAST:event_jButton27ActionPerformed
 
     private void mUsuarioIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mUsuarioIDActionPerformed
@@ -5090,32 +5172,36 @@ public class home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton29ActionPerformed
 
     private void jButton30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton30ActionPerformed
-        // TODO add your handling code here:
-        UsuarioController userControl = new UsuarioController();
-        try {
-            System.out.print(mUsuarioID1.getText());
-            userControl.borrarUsuario(mUsuarioID1.getText());
-            jTextField26.setText("");
-            jPasswordField2.setText("");
-            jTextField35.setText("");
-            jTextField43.setText("");
-            jTextField44.setText("");
-            mUsuarioID.setText("");
-
+        try {                                          
+            // TODO add your handling code here:
+            UsuarioController userControl = new UsuarioController();
+            try {
+                System.out.print(mUsuarioID1.getText());
+                userControl.borrarUsuario(mUsuarioID1.getText());
+                jTextField26.setText("");
+                jPasswordField2.setText("");
+                jTextField35.setText("");
+                jTextField43.setText("");
+                jTextField44.setText("");
+                mUsuarioID.setText("");
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            CardLayout card = (CardLayout) configuracionSubPanel.getLayout();
+            card.show(configuracionSubPanel, "configuracionUsuariosPanel");
+            CardLayout card2 = (CardLayout) configuracionUsuariosPanel.getLayout();
+            card2.show(configuracionUsuariosPanel, "todosUsuariosPanel");
+            DefaultTableModel model = null;
+            try {
+                model = userControl.todosUsuariosDisplay();
+            } catch (SQLException ex) {
+                Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            tableUsuarios.setModel(model);
         } catch (SQLException ex) {
             Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
         }
-        CardLayout card = (CardLayout) configuracionSubPanel.getLayout();
-        card.show(configuracionSubPanel, "configuracionUsuariosPanel");
-        CardLayout card2 = (CardLayout) configuracionUsuariosPanel.getLayout();
-        card2.show(configuracionUsuariosPanel, "todosUsuariosPanel");
-        DefaultTableModel model = null;
-        try {
-            model = userControl.todosUsuariosDisplay();
-        } catch (SQLException ex) {
-            Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        tableUsuarios.setModel(model);
     }//GEN-LAST:event_jButton30ActionPerformed
 
     private void mUsuarioID1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mUsuarioID1ActionPerformed
@@ -5151,7 +5237,7 @@ public class home extends javax.swing.JFrame {
 
                 String sql = "SELECT * FROM productos";
 
-                statement = connection.createStatement();
+                statement = postgresConnection.createStatement();
                 resultSet = statement.executeQuery(sql);
 
                 while (resultSet.next()) {
@@ -5200,7 +5286,7 @@ public class home extends javax.swing.JFrame {
                     if (buscarClienteVentaField.getSelectedIndex() != -1) {
                         try {
                             String selectSQL = "SELECT * FROM clientes";
-                            statement = connection.createStatement();
+                            statement = postgresConnection.createStatement();
                             resultSet = statement.executeQuery(selectSQL);
 
                             while (resultSet.next()) {
@@ -5297,7 +5383,7 @@ public class home extends javax.swing.JFrame {
             ResultSet resultSet;
             Statement statement;
             String selectSQL = "SELECT * FROM proveedores";
-            statement = connection.createStatement();
+            statement = postgresConnection.createStatement();
             resultSet = statement.executeQuery(selectSQL);
 
             while (resultSet.next()) {
@@ -5326,7 +5412,7 @@ public class home extends javax.swing.JFrame {
                 ResultSet resultSet;
                 Statement statement;
                 String selectSQL = "SELECT * FROM proveedores";
-                statement = connection.createStatement();
+                statement = postgresConnection.createStatement();
                 resultSet = statement.executeQuery(selectSQL);
 
                 int proveedorID = 0, productoID = 0, cantidad, existencias = 0;
@@ -5339,7 +5425,7 @@ public class home extends javax.swing.JFrame {
                 }
 
                 selectSQL = "SELECT * FROM productos";
-                statement = connection.createStatement();
+                statement = postgresConnection.createStatement();
                 resultSet = statement.executeQuery(selectSQL);
 
                 while (resultSet.next()) {
@@ -5387,7 +5473,7 @@ public class home extends javax.swing.JFrame {
                 int numeroProductosVendidos = 0;
 
                 String selectSQL = "SELECT * FROM ventas WHERE fk_corteid = " + corteControl.getCorteNumero();
-                statement = connection.createStatement();
+                statement = postgresConnection.createStatement();
                 resultSet = statement.executeQuery(selectSQL);
 
                 while (resultSet.next()) {
@@ -5411,7 +5497,7 @@ public class home extends javax.swing.JFrame {
                 numeroProductosVendidos = 0;
 
                 selectSQL = "SELECT * FROM ventas WHERE fk_corteid = " + corteControl.getCorteNumero();
-                statement = connection.createStatement();
+                statement = postgresConnection.createStatement();
                 resultSet = statement.executeQuery(selectSQL);
 
                 while (resultSet.next()) {
@@ -5829,11 +5915,8 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JPanel proveedoresSubPanel;
     private javax.swing.JTextField rfcProveedor;
     private javax.swing.JLabel salirLabel;
-    private javax.swing.JLabel successBorrado;
     private javax.swing.JLabel successCompra;
     private javax.swing.JLabel successCorte;
-    private javax.swing.JLabel successLabel;
-    private javax.swing.JLabel successMessage;
     private javax.swing.JTable tablaProveedores;
     private javax.swing.JPanel tableHeaders;
     private javax.swing.JTable tableUsuarios;

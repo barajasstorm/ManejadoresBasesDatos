@@ -11,6 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -19,25 +22,80 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ProductoController extends Producto {
 
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection postgresConnection = connector.getPostgresConnection();
+    Connection mysqlConnection = connector.getMysqlConnection();
+    PreparedStatement postgresBegin;
+    PreparedStatement postgresCommit;
+    PreparedStatement postgresRollback;
+    PreparedStatement mysqlBegin;
+    PreparedStatement mysqlCommit;
+    PreparedStatement mysqlRollback;
+    PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Statement statement = null;
+    boolean mysql = false;
+    boolean postgres = false;
+    int mysqlCount = 0;
+    int postgresCount = 0;
+
+    public ProductoController() throws SQLException {     
+        
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
+       
+            
+            
+            
+        
+    }
 
     public boolean agregarProducto(String nombre, double precioCompra, double precioVenta, int existencias, int stockMinimo) throws SQLException {
 
         //search for product
         int encontrado = buscarProducto(nombre);
-
         //insert product into database
         if (encontrado != -1) {
             System.out.print("Producto no insertado");
             return true;
         } else {
-            //Insert product into database after validation
-            String insertSQL = "insert into productos (nombre,preciocompra,precioventa,existencias,stockminimo,activo) values ('" + nombre + "','" + precioCompra + ",'" + precioVenta + "','" + existencias + "','" + stockMinimo + "',1);";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            //Insert product into database after validation         
+            preparedStatement = postgresConnection.prepareStatement("insert into productos (nombre,preciocompra,precioventa,existencias,stockminimo,activo) values (?,?,?,?,?,?);");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setDouble(2, precioCompra);
+            preparedStatement.setDouble(3, precioVenta);
+            preparedStatement.setInt(4, existencias);
+            preparedStatement.setInt(5, stockMinimo);
+            preparedStatement.setInt(6,1);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("insert into productos (nombre,preciocompra,precioventa,existencias,stockminimo,activo) values (?,?,?,?,?,?);");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setDouble(2, precioCompra);
+            preparedStatement.setDouble(3, precioVenta);
+            preparedStatement.setInt(4, existencias);
+            preparedStatement.setInt(5, stockMinimo);
+            preparedStatement.setInt(6,1);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                System.out.println("Transaction failed.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+                System.out.println("Transaction was successful.");
+            }
+            
             return false;
         }
     }
@@ -48,15 +106,35 @@ public class ProductoController extends Producto {
 
         //delete if found
         if (encontrado > 0) {
-            String insertSQL = "DELETE FROM productos WHERE pk_productoid = " + encontrado;
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            //String insertSQL = "DELETE FROM productos WHERE pk_productoid = " + encontrado;
+            preparedStatement = postgresConnection.prepareStatement("DELETE FROM productos WHERE pk_productoid = ? ");
+            preparedStatement.setInt(1, encontrado);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("DELETE FROM productos WHERE pk_productoid = ? ");
+            preparedStatement.setInt(1, encontrado);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                JOptionPane.showMessageDialog(null, "Transaccion fallo. Error en bases de datos.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+            }
+            
+            
         }
     }
 
     public int buscarProducto(String nombreProd) throws SQLException {
+        
         String selectSQL = "SELECT * FROM productos";
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(selectSQL);
 
         while (resultSet.next()) {
@@ -78,10 +156,43 @@ public class ProductoController extends Producto {
 
         //delete if found
         if (encontrado > 0) {
-            System.out.print(encontrado);
-            String insertSQL = "UPDATE productos SET nombre = '" + nombre + "', preciocompra = '" + precioCompra + "', precioventa = '" + precioVenta + "', existencias = '" + existencias + "', stockminimo = '" + stockMinimo + "' WHERE pk_productoid = " + encontrado;
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            preparedStatement = postgresConnection.prepareStatement("UPDATE productos SET nombre = ?, preciocompra = ?, precioventa = ?, existencias = ?, stockminimo = ? WHERE pk_productoid = ?;");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setDouble(2, precioCompra);
+            preparedStatement.setDouble(3, precioVenta);
+            preparedStatement.setInt(4, existencias);
+            preparedStatement.setInt(5, stockMinimo);
+            preparedStatement.setInt(6, encontrado);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("UPDATE productos SET nombre = ?, preciocompra = ?, precioventa = ?, existencias = ?, stockminimo = ? WHERE pk_productoid = ?;");
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setDouble(2, precioCompra);
+            preparedStatement.setDouble(3, precioVenta);
+            preparedStatement.setInt(4, existencias);
+            preparedStatement.setInt(5, stockMinimo);
+            preparedStatement.setInt(6, encontrado);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0) {
+                System.out.println("postgres fallo");
+            }
+            
+            if(mysqlCount == 0) {
+                System.out.println("Mysql fallo");
+            }
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                JOptionPane.showMessageDialog(null, "Transaccion fallo. Error en bases de datos.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+            }
+            
         }
     }
     
@@ -90,21 +201,38 @@ public class ProductoController extends Producto {
 
         //delete if found
         if (encontrado > 0) {
-            System.out.print(encontrado);
-            String insertSQL = "UPDATE productos SET existencias = '" + existencias + "' WHERE pk_productoid = " + encontrado;
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            
+            preparedStatement = postgresConnection.prepareStatement("UPDATE productos SET existencias = ? WHERE pk_productoid = ?");
+            preparedStatement.setInt(1, existencias);
+            preparedStatement.setInt(2, encontrado);
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatement.executeUpdate();
+            
+            preparedStatement = mysqlConnection.prepareStatement("UPDATE productos SET existencias = ? WHERE pk_productoid = ?");
+            preparedStatement.setInt(1, existencias);
+            preparedStatement.setInt(2, encontrado);
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatement.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                JOptionPane.showMessageDialog(null, "Transaccion fallo. Error en bases de datos.");
+                postgresRollback.executeUpdate();
+                mysqlRollback.executeUpdate();
+            } else {
+                postgresCommit.executeUpdate();
+                mysqlCommit.executeUpdate();
+            }
+            
         }
     }
 
     public DefaultTableModel todosProductosDisplay() throws SQLException {
-        Postgres postgres = new Postgres();
-        Connection connection = postgres.connect();
+
 
         DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Nombre", "Precio Compra", "Precio Venta", "Existencias", "Stock Minimo"}, 0);
         String sql = "SELECT * FROM productos";
 
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {
@@ -120,13 +248,12 @@ public class ProductoController extends Producto {
     }
 
     public DefaultTableModel todosProductosBajosDisplay() throws SQLException {
-        Postgres postgres = new Postgres();
-        Connection connection = postgres.connect();
+
 
         DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Nombre", "Precio Compra", "Precio Venta", "Existencias", "Stock Minimo"}, 0);
         String sql = "SELECT * FROM productos WHERE existencias < stockminimo";
 
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {

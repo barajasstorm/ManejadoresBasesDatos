@@ -6,6 +6,7 @@
 package Controllers;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,18 +17,41 @@ import java.sql.Statement;
  */
 public class VentaController {
     
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection postgresConnection = connector.getPostgresConnection();
+    Connection mysqlConnection = connector.getMysqlConnection();
+    PreparedStatement postgresBegin;
+    PreparedStatement postgresCommit;
+    PreparedStatement postgresRollback;
+    PreparedStatement mysqlBegin;
+    PreparedStatement mysqlCommit;
+    PreparedStatement mysqlRollback;
+    PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Statement statement = null;
+    boolean mysql = false;
+    boolean postgres = false;
+    int mysqlCount = 0;
+    int postgresCount = 0;
     
     private int ticketNumero;
     private int actualID;
     
     
+    public VentaController() throws SQLException {
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
+    }
+    
     public void siguienteTicket() throws SQLException {
         String selectSQL = "SELECT * FROM ventas ORDER BY pk_ventaid DESC LIMIT 1";
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(selectSQL);
         while (resultSet.next()) {
             setTicketNumero((resultSet.getInt("numeroticket")) + 1);
@@ -36,7 +60,7 @@ public class VentaController {
     
     public void calculateActualIDFromDatabase() throws SQLException {
         String selectSQL = "SELECT * FROM ventas ORDER BY pk_ventaid DESC LIMIT 1";
-        statement = connection.createStatement();
+        statement = postgresConnection.createStatement();
         resultSet = statement.executeQuery(selectSQL);
         while (resultSet.next()) {
             setActualID((resultSet.getInt("pk_ventaid")));
@@ -58,14 +82,5 @@ public class VentaController {
     public void setActualID(int actualID) {
         this.actualID = actualID;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
 }

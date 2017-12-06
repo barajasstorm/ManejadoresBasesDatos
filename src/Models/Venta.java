@@ -5,7 +5,7 @@
  */
 package Models;
 
-import Controllers.Postgres;
+import Controllers.Connector;
 import java.sql.Connection;
 import static java.sql.JDBCType.NULL;
 import java.sql.PreparedStatement;
@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,10 +22,23 @@ import java.util.logging.Logger;
  */
 public class Venta {
     
-    Postgres postgres = new Postgres();
-    Connection connection = postgres.connect();
+    Connector connector = new Connector();
+    Connection postgresConnection = connector.getPostgresConnection();
+    Connection mysqlConnection = connector.getMysqlConnection();
+    PreparedStatement postgresBegin;
+    PreparedStatement postgresCommit;
+    PreparedStatement postgresRollback;
+    PreparedStatement mysqlBegin;
+    PreparedStatement mysqlCommit;
+    PreparedStatement mysqlRollback;
+    PreparedStatement preparedStatementPostgres = null;
+    PreparedStatement preparedStatementMysql = null;
     ResultSet resultSet = null;
     Statement statement = null;
+    boolean mysql = false;
+    boolean postgres = false;
+    int mysqlCount = 0;
+    int postgresCount = 0;
     
     //Instance Variables
     private int pk_ventaID;
@@ -39,16 +53,37 @@ public class Venta {
     private int cantidadArticulos;
     private double total;
 
-    public Venta() {
+    public Venta() throws SQLException {
+        
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
+
         this.fk_clienteID = 0;
     }
     
-    public Venta(int numeroTicket) {
+    public Venta(int numeroTicket) throws SQLException {
+        
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
+        
+        
         this.numeroTicket = numeroTicket;
         this.fk_clienteID = 0;
     }
     
-    public Venta(int pk_ventaID, int fk_usuarioID, int fk_corteID, int fk_clienteID, int numeroTicket, int dia, int mes, int ano, String hora, int cantidadArticulos, double total) {
+    public Venta(int pk_ventaID, int fk_usuarioID, int fk_corteID, int fk_clienteID, int numeroTicket, int dia, int mes, int ano, String hora, int cantidadArticulos, double total) throws SQLException {
         this.pk_ventaID = pk_ventaID;
         this.fk_usuarioID = fk_usuarioID;
         this.fk_corteID = fk_corteID;
@@ -60,39 +95,18 @@ public class Venta {
         this.hora = hora;
         this.cantidadArticulos = cantidadArticulos;
         this.total = total;
+        
+        if(postgresConnection != null && mysqlConnection != null) {
+            this.postgresCommit = postgresConnection.prepareStatement("COMMIT;");
+            this.postgresBegin = postgresConnection.prepareStatement("BEGIN;");
+            this.postgresRollback = postgresConnection.prepareStatement("ROLLBACK;");
+            this.mysqlBegin = mysqlConnection.prepareStatement("BEGIN;");
+            this.mysqlCommit = mysqlConnection.prepareStatement("COMMIT;");
+            this.mysqlRollback = mysqlConnection.prepareStatement("ROLLBACK;");
+        }
+        
     }
 
-    public Postgres getPostgres() {
-        return postgres;
-    }
-
-    public void setPostgres(Postgres postgres) {
-        this.postgres = postgres;
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
-
-    public ResultSet getResultSet() {
-        return resultSet;
-    }
-
-    public void setResultSet(ResultSet resultSet) {
-        this.resultSet = resultSet;
-    }
-
-    public Statement getStatement() {
-        return statement;
-    }
-
-    public void setStatement(Statement statement) {
-        this.statement = statement;
-    }
 
     public int getPk_ventaID() {
         return pk_ventaID;
@@ -184,15 +198,73 @@ public class Venta {
 
     public void saveToDatabase() {
         try {
-            String insertSQL;
             if(this.fk_clienteID == 0) {
-                insertSQL = "insert into ventas (fk_usuarioid,fk_corteid,numeroticket,dia,mes,ano,hora,cantarticulos,total) values ('" + this.fk_usuarioID + "','" + this.fk_corteID + "','" + this.numeroTicket + "','" + this.dia + "','" + this.mes + "','" + this.ano + "','" + this.hora + "','" + this.cantidadArticulos + "','" + this.total + "');";
+                
+                preparedStatementPostgres = postgresConnection.prepareStatement("insert into ventas (fk_usuarioid,fk_corteid,numeroticket,dia,mes,ano,hora,cantarticulos,total) values (?,?,?,?,?,?,?,?,?)");
+                preparedStatementPostgres.setInt(1, this.fk_usuarioID);
+                preparedStatementPostgres.setInt(2, this.fk_corteID);
+                preparedStatementPostgres.setInt(3, this.numeroTicket);
+                preparedStatementPostgres.setInt(4, this.dia);
+                preparedStatementPostgres.setInt(5, this.mes);
+                preparedStatementPostgres.setInt(6, this.ano);
+                preparedStatementPostgres.setString(7, this.hora);
+                preparedStatementPostgres.setInt(8, this.cantidadArticulos);
+                preparedStatementPostgres.setDouble(9,this.total);
+
+                preparedStatementMysql = mysqlConnection.prepareStatement("insert into ventas (fk_usuarioid,fk_corteid,numeroticket,dia,mes,ano,hora,cantarticulos,total) values (?,?,?,?,?,?,?,?,?)");
+                preparedStatementMysql.setInt(1, this.fk_usuarioID);
+                preparedStatementMysql.setInt(2, this.fk_corteID);
+                preparedStatementMysql.setInt(3, this.numeroTicket);
+                preparedStatementMysql.setInt(4, this.dia);
+                preparedStatementMysql.setInt(5, this.mes);
+                preparedStatementMysql.setInt(6, this.ano);
+                preparedStatementMysql.setString(7, this.hora);
+                preparedStatementMysql.setInt(8, this.cantidadArticulos);
+                preparedStatementMysql.setDouble(9,this.total);
+
             } else {
-                insertSQL = "insert into ventas (fk_usuarioid,fk_corteid,fk_clienteid,numeroticket,dia,mes,ano,hora,cantarticulos,total) values ('" + this.fk_usuarioID + "','" + this.fk_corteID + "','" + this.fk_clienteID + "','" + this.numeroTicket + "','" + this.dia + "','" + this.mes + "','" + this.ano + "','" + this.hora + "','" + this.cantidadArticulos + "','" + this.total + "');";
+                
+                preparedStatementPostgres = postgresConnection.prepareStatement("insert into ventas (fk_usuarioid,fk_corteid,numeroticket,dia,mes,ano,hora,cantarticulos,total) values (?,?,?,?,?,?,?,?,?)");
+                preparedStatementPostgres.setInt(1, this.fk_usuarioID);
+                preparedStatementPostgres.setInt(2, this.fk_corteID);
+                preparedStatementPostgres.setInt(3, this.fk_clienteID);
+                preparedStatementPostgres.setInt(4, this.numeroTicket);
+                preparedStatementPostgres.setInt(5, this.dia);
+                preparedStatementPostgres.setInt(6, this.mes);
+                preparedStatementPostgres.setInt(7, this.ano);
+                preparedStatementPostgres.setString(7, this.hora);
+                preparedStatementPostgres.setInt(8, this.cantidadArticulos);
+                preparedStatementPostgres.setDouble(9, this.total);
+                
+                preparedStatementMysql = mysqlConnection.prepareStatement("insert into ventas (fk_usuarioid,fk_corteid,numeroticket,dia,mes,ano,hora,cantarticulos,total) values (?,?,?,?,?,?,?,?,?)");
+                preparedStatementMysql.setInt(1, this.fk_usuarioID);
+                preparedStatementMysql.setInt(2, this.fk_corteID);
+                preparedStatementMysql.setInt(3, this.fk_clienteID);
+                preparedStatementMysql.setInt(4, this.numeroTicket);
+                preparedStatementMysql.setInt(5, this.dia);
+                preparedStatementMysql.setInt(6, this.mes);
+                preparedStatementMysql.setInt(7, this.ano);
+                preparedStatementMysql.setString(7, this.hora);
+                preparedStatementMysql.setInt(8, this.cantidadArticulos);
+                preparedStatementMysql.setDouble(9, this.total);
+
             }
             //Insert product into database after validation           
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.executeUpdate();
+            postgresBegin.executeUpdate();
+            postgresCount = preparedStatementPostgres.executeUpdate();
+            mysqlBegin.executeUpdate();
+            mysqlCount = preparedStatementMysql.executeUpdate();
+            
+            if(postgresCount == 0 || mysqlCount == 0) {
+                JOptionPane.showMessageDialog(null, "Transaccion fallo. Error en bases de datos.");
+                    postgresRollback.executeUpdate();
+                    mysqlRollback.executeUpdate();
+                } else {
+                    postgresCommit.executeUpdate();
+                    mysqlCommit.executeUpdate();
+                    System.out.println("Transaction was successful.");
+                }
+                
         } catch (SQLException ex) {
             Logger.getLogger(Venta.class.getName()).log(Level.SEVERE, null, ex);
         }
