@@ -8,6 +8,7 @@ package Views;
 import Controllers.*;
 import Views.*;
 import Models.*;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.*;
 import java.sql.Statement;
@@ -47,6 +48,8 @@ public class Main {
             try {
                 new home().setVisible(true);
             } catch (SQLException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

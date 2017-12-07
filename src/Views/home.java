@@ -20,6 +20,9 @@ import javax.swing.ImageIcon;
 import Controllers.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -27,19 +30,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-import static jdk.nashorn.internal.objects.NativeRegExp.test;
 
 /**
  *
  * @author juanba
  */
 public class home extends javax.swing.JFrame {
+    
+    final BufferedImage image;
+
 
     private boolean loginAttempt = false;
     ProductoController prodControl;
@@ -77,8 +83,16 @@ public class home extends javax.swing.JFrame {
 
     /**
      * Creates new form home
+     * @throws java.sql.SQLException
      */
-    public home() throws SQLException {
+    public home() throws SQLException, MalformedURLException, IOException {
+        this.image = ImageIO.read(new URL("http://www.cam2pet.com/wp-content/uploads/2014/06/background.jpg"));
+        
+        
+
+        
+        
+        
         this.prodControl = new ProductoController();
         initComponents();
 
@@ -250,9 +264,6 @@ public class home extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jTextField3 = new javax.swing.JTextField();
-        finalPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory(null).createEntityManager();
-        productosQuery = java.beans.Beans.isDesignTime() ? null : finalPUEntityManager.createQuery("SELECT p FROM Productos p");
-        productosList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : productosQuery.getResultList();
         mainMasterPanel = new javax.swing.JPanel();
         loginPanel = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -1181,6 +1192,7 @@ public class home extends javax.swing.JFrame {
         );
 
         todosProductosVentasTable.setModel(modelVentas);
+        todosProductosVentasTable.setOpaque(false);
         jScrollPane3.setViewportView(todosProductosVentasTable);
 
         javax.swing.GroupLayout brownBackgroundLayout = new javax.swing.GroupLayout(brownBackground);
@@ -5622,7 +5634,6 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JLabel errorLogin;
     private javax.swing.JLabel errorVentas;
     private javax.swing.JLabel errorYaExiste;
-    private javax.persistence.EntityManager finalPUEntityManager;
     private javax.swing.JButton guardarCambioButton;
     private javax.swing.JButton guardarProveedor;
     private javax.swing.JLabel headerBackgroundImage;
@@ -5900,7 +5911,6 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JTextField productoBorrarField;
     private javax.swing.JComboBox<String> productoBuscarCompraField;
     private java.util.List<Views.Productos> productosList;
-    private javax.persistence.Query productosQuery;
     private javax.swing.JButton provAgregarButton;
     private javax.swing.JPanel provAgregarPanel;
     private javax.swing.JButton provBorrarButton;
